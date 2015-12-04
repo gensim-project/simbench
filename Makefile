@@ -4,7 +4,7 @@ PLATFORM ?= none
 BENCHMARKS=
 export BASEDIR=$(CURDIR)
 
-all : out/$(ARCH)/$(PLATFORM)/simbench
+all : out/$(ARCH)/$(PLATFORM)/simbench host/host
 
 PLATFORM_A = platform/$(ARCH)/$(PLATFORM)/platform.a
 ARCH_A = arch/$(ARCH)/arch.a
@@ -25,9 +25,13 @@ $(HARNESS_A) :
 $(BMARKS_A) : 
 	make -C benchmarks/
 
+host/host : 
+	make -C host
+
 clean:
 	-make -C arch/$(ARCH) clean
 	-make -C platform/$(ARCH)/$(PLATFORM) clean
 	-make -C harness/ clean
 	-make -C benchmarks/ clean
+	-make -C host/ clean
 	rm -rf out
