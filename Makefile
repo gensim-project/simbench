@@ -8,7 +8,7 @@ all : out/$(ARCH)/$(PLATFORM)/simbench
 
 PLATFORM_A = platform/$(ARCH)/$(PLATFORM)/platform.a
 ARCH_A = arch/$(ARCH)/arch.a
-HARNESS_A = harness/harness.a
+HARNESS_A = out/$(ARCH)/harness.a
 
 include platform/$(ARCH)/$(PLATFORM)/Make.simbench
 

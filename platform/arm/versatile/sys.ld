@@ -14,11 +14,27 @@ SECTIONS
 		KEEP(*(.startup));
 		KEEP(*(.vectors))
 		*(.text) 
+		
+		KEEP(*(.ctors))
 	}
 
 	. = 0x08000000;
-	.data : { *(.data) }
-	.bss : { *(.bss) }
+	.data : 
+	{ 
+		*(.data) 
+	}
+	
+	.init_array : 
+	{
+		_CTORS_START = .;
+		*(.init_array)
+		_CTORS_END = .;
+	}
+	
+	.bss : 
+	{ 
+		*(.bss) 
+	}
 
 }
 
