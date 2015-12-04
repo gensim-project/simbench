@@ -9,6 +9,7 @@ reset_handler:
 	bl arch_init
 	bl platform_init
 	
+	bl harness_init
 	bl harness_main
 	
 	bl platform_shutdown

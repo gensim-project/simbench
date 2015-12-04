@@ -13,21 +13,26 @@ SECTIONS
 		KEEP(*sys.o(.vectors));
 		KEEP(*(.startup));
 		KEEP(*(.vectors))
-		*(.text) 
-		
-		KEEP(*(.ctors))
+		*(.text) 		
+	}
+
+	.ctors :
+	{
+		KEEP (*(SORT(.ctors.*)))
+		KEEP (*(.ctors))
 	}
 
 	. = 0x08000000;
 	.data : 
 	{ 
 		*(.data) 
+		SORT(CONSTRUCTORS)
 	}
 	
 	.init_array : 
 	{
 		_CTORS_START = .;
-		*(.init_array)
+		KEEP(*(.init_array));
 		_CTORS_END = .;
 	}
 	

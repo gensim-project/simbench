@@ -1,3 +1,5 @@
-out/arm/versatile/simbench : $(ARCH_A) $(PLATFORM_A) $(HARNESS_A)
+include $(BASEDIR)/arch/$(ARCH)/Make.config
+
+out/arm/versatile/simbench : $(ARCH_A) $(PLATFORM_A) $(HARNESS_A) $(BMARKS_A)
 	mkdir -p `dirname $@`
-	arm-unknown-eabi-gcc -nostdlib -T platform/arm/versatile/sys.ld $(LDFLAGS) $^ -o $@
+	$(LD) -nostdlib -T platform/arm/versatile/sys.ld $(LDFLAGS) $^ -o $@
