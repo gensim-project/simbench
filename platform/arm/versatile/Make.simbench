@@ -1,0 +1,3 @@
+out/arm/versatile/simbench : $(ARCH_A) $(PLATFORM_A) $(HARNESS_A)
+	mkdir -p `dirname $@`
+	arm-unknown-eabi-gcc -nostdlib -T platform/arm/versatile/sys.ld $(LDFLAGS) $^ -o $@

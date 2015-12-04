@@ -1,0 +1,74 @@
+.arm
+.text
+
+.globl reset_handler
+reset_handler:
+	bl setup_stacks
+	bl load_vectors
+	
+	bl arch_init
+	bl platform_init
+	
+	bl harness_main
+	
+	bl platform_shutdown
+1:
+	b 1b
+.size reset_handler, .-reset_handler
+
+setup_stacks:
+	//Back up old cpsr
+	mrs r1, cpsr
+	
+	//Set up stack for USR mode (can't do this in hardware)
+	ldr r0, =stack_top
+	str r0, [r0]
+	ldm r0, {sp}^
+	
+	//Set up stack for IRQ mode
+	mov r0, #0x12
+	msr cpsr_c, r0
+	ldr sp, =irq_stack_top
+	
+	//restore old mode
+	msr cpsr_c, r1
+	
+	//set up swi stack
+	ldr sp, =swi_stack_top
+	
+	bx lr
+.size setup_stacks,.-setup_stacks
+
+
+load_vectors:
+	ldr r0, =vectors_start
+	ldr r1, =vectors_end
+	mov r3, #0
+
+1:
+	ldr r2, [r0], #4
+	str r2, [r3], #4
+	cmp r0, r1
+	bne 1b
+
+	bx lr
+
+
+.data
+.align 8
+stack_bottom:
+.space (1024*1024) - 4
+stack_top:
+.word 0
+
+.align 8
+irq_stack_bottom:
+.space 2044
+irq_stack_top:
+.word 0
+
+.align 8
+swi_stack_bottom:
+.space 2044
+swi_stack_top:
+.word 0	
