@@ -5,8 +5,9 @@ SECTIONS
 	{
 		*vectors.o;
 	}
-	
+
 	. = 0x10000;
+	_TEXT_START = .;
 	.text : 
 	{ 
 		*sys.o(.startup);
@@ -21,8 +22,10 @@ SECTIONS
 		KEEP (*(SORT(.ctors.*)))
 		KEEP (*(.ctors))
 	}
+	_TEXT_END = .;
 
 	. = 0x08000000;
+	_DATA_START = .;
 	.data : 
 	{ 
 		*(.data) 
@@ -40,6 +43,7 @@ SECTIONS
 	{ 
 		*(.bss) 
 	}
+	_DATA_END = .;
 
 }
 

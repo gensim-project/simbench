@@ -4,7 +4,7 @@ CC=arm-unknown-eabi-gcc
 
 CFLAGS=-I$(BASEDIR)/include
 
-PLATFORM_O := uart.o platform.o
+PLATFORM_O := uart.o platform.o mem.o
 
 platform.a : $(PLATFORM_O)
 	ar q $@ $^

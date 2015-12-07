@@ -11,6 +11,6 @@ typedef struct {
 	benchmark_kernel_t kernel;
 } benchmark_t;
 
-#define REG_BENCHMARK(x) __attribute__((constructor)) static void reg_bmark() { harness_register_benchmark(x); }
+#define REG_BENCHMARK(x) __attribute__((constructor)) static void reg_bmark ## x() { harness_register_benchmark(&x); }
 
 #endif
