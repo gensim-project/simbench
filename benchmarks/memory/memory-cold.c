@@ -29,4 +29,4 @@ static benchmark_t bmark = {
 	.kernel=kernel
 };
 
-REG_BENCHMARK(&bmark);
+REG_BENCHMARK(bmark);
