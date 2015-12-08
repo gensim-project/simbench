@@ -53,7 +53,7 @@ static void kernel_mmu_cleanup()
 }
 
 static benchmark_t bmark = {
-	.name="TLB-Flush",
+	.name="TLB-Evict",
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel_mmu,
