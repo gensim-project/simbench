@@ -6,96 +6,85 @@
 
 #define NOREORDER 
 #define NOINLINE __attribute__((noinline))
-asm (".align 12\n") NOREORDER;
+#define ALIGN __attribute__((aligned(4096)))
 
 static volatile uint32_t value;
 
-static void NOINLINE fn1()
+static void NOINLINE ALIGN fn1() 
 {
 	asm volatile ("");
 	value = 1;
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn2()
+static void NOINLINE ALIGN fn2() 
 {
 	asm volatile ("");
 	value = 2;
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn3(int x)
+static void NOINLINE ALIGN fn3(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn1();
 	else fn2();
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn4()
+static void NOINLINE ALIGN fn4()
 {
 	asm volatile ("");
 	fn1();
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn5(int x)
+static void NOINLINE ALIGN fn5(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn3(x >> 1);
 	else fn4();
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn6(int x)
+static void NOINLINE ALIGN fn6(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn3(x >> 1);
 	else fn1();
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn7(int x)
+static void NOINLINE ALIGN fn7(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn6(x >> 1);
 	else fn5(x >> 1);
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn8(int x)
+static void NOINLINE ALIGN fn8(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn1();
 	else fn3(x >> 1);
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn9(int x)
+static void NOINLINE ALIGN fn9(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn8(x >> 1);
 	else fn5(x >> 1);
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn10(int x)
+static void NOINLINE ALIGN fn10(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn8(x >> 1);
 	else fn7(x >> 1);
 }
 
-asm (".align 12\n") NOREORDER;
-static void NOINLINE fn11(int x)
+static void NOINLINE ALIGN fn11(int x)
 {
 	asm volatile ("");
 	if(x & 1) fn9(x >> 1);
 	else fn10(x >> 1);
 }
 
-asm (".align 12\n") NOREORDER;
-static void kernel()
+static void ALIGN kernel()
 {
 	uint64_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_ITERATIONS;
 	uint64_t i;

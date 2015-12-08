@@ -2,19 +2,15 @@
 
 #include <stdint.h>
 
-#define NOREORDER 
-//#define NOREORDER __attribute__((no_reorder))
-
 #define DISPATCH_ITERATIONS 100
+#define ALIGN __attribute__((aligned(4096)))
 
-asm (".align 12\n") NOREORDER;
-
-#define leaf_fn(x) asm (".align 12\n") NOREORDER; static void NOREORDER fn ## x() {}
+#define leaf_fn(x) static void ALIGN fn ## x() {}
 
 #define FN_TABLE_SIZE 16
 static benchmark_kernel_t fn_table[];
 
-static void NOREORDER dispatch (int i) {
+static void ALIGN dispatch (int i) {
 	while(i--) {
 		fn_table[i % FN_TABLE_SIZE]();
 	}
