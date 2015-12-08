@@ -1,0 +1,5 @@
+syntax:regexp
+\.a$
+\.o$
+^out/
+host/host
