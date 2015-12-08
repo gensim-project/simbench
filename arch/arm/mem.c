@@ -28,6 +28,11 @@ static void write_ttbr(void* ttbr_val)
 	asm("mcr p15, 0, %0, cr2, cr0, 0" :: "r"(ttbr_val) :);
 }
 
+static void write_dacr(uint32_t dacr_val)
+{
+	asm("mcr p15, 0, %0, cr3, cr0, 0" :: "r"(dacr_val) :);
+}
+
 extern void *vectors_start, *vectors_end, *_TEXT_START, *_TEXT_END, *_DATA_START, *_DATA_END;
 
 static int mem_create_region_id_mapping(size_t region_start, size_t region_end)
@@ -65,6 +70,16 @@ void mem_init()
 	
 	DEBUG("Mapping data\n");
 	mem_create_region_id_mapping(&_DATA_START, &_DATA_END);
+	
+	phys_mem_info_t *dev_info = mem_get_device_info();
+	DEBUG("Mapping devices\n");
+	while(dev_info) {
+		mem_create_region_id_mapping(dev_info->phys_mem_start, dev_info->phys_mem_end);
+		dev_info = dev_info->next_mem;
+	}
+	
+	DEBUG("Writing DACR\n");
+	write_dacr(0xffffffff);
 	
 	mem_inited = 1;
 }

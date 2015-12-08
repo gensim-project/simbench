@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#define MEMORY_BENCHMARK_ITERATIONS 10
+#define MEMORY_BENCHMARK_ITERATIONS 2
 
 static void kernel()
 {

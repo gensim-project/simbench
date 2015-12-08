@@ -30,5 +30,6 @@ typedef struct {
 } phys_mem_info_t;
 
 const phys_mem_info_t *mem_get_phys_info();
+const phys_mem_info_t *mem_get_device_info();
 
 #endif

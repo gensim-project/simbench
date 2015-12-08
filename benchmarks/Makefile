@@ -1,6 +1,8 @@
 include $(BASEDIR)/arch/$(ARCH)/Make.config
 
-benchmarks=memory/memory-hot.o memory/memory-cold.o
+mem-benchmarks=memory/tlb-flush.o memory/tlb-evict.o #memory/memory-hot.o memory/memory-cold.o 
+
+benchmarks=$(mem-benchmarks)
 
 
 $(BASEDIR)/out/$(ARCH)/benchmarks.a : $(benchmarks)
