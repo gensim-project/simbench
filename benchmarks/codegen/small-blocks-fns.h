@@ -1,0 +1,38 @@
+#ifndef DOFN
+#error DOFN must be defined!
+#endif
+
+#ifndef LASTFN
+#error LASTFN must be defined!
+#endif
+
+DOFN(1)
+DOFN(2)
+DOFN(3)
+DOFN(4)
+DOFN(5)
+DOFN(6)
+DOFN(7)
+DOFN(8)
+DOFN(9)
+DOFN(10)
+DOFN(11)
+DOFN(12)
+DOFN(13)
+DOFN(14)
+DOFN(15)
+DOFN(16)
+DOFN(17)
+DOFN(18)
+DOFN(19)
+DOFN(20)
+DOFN(21)
+DOFN(22)
+DOFN(23)
+DOFN(24)
+DOFN(25)
+DOFN(26)
+DOFN(27)
+DOFN(28)
+DOFN(29)
+LASTFN(30)

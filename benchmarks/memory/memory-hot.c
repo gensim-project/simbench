@@ -7,6 +7,7 @@
 
 static volatile uint32_t value = 0;
 
+asm (".align 12\n");
 static void kernel()
 {
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;

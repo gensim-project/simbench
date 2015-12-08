@@ -6,6 +6,8 @@
 #define MEMORY_BENCHMARK_ITERATIONS 2000
 #define VIRT_BASE 0x40000000
 
+asm (".align 12\n");
+
 static size_t virt_start, virt_end;
 
 static void kernel_mmu_init()

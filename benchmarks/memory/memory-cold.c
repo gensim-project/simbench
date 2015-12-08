@@ -4,6 +4,8 @@
 
 #define MEMORY_BENCHMARK_ITERATIONS 2
 
+asm (".align 12\n");
+
 static void kernel()
 {
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
