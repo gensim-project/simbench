@@ -11,18 +11,18 @@ extern void mem_mmu_enable();
 extern void mem_mmu_disable();
 
 extern void mem_tlb_flush();
-extern void mem_tlb_evict(void *ptr);
+extern void mem_tlb_evict(uintptr_t ptr);
 
 /* Page table manipulation operations */
 
 extern size_t mem_get_page_size();
-extern int mem_create_page_mapping(size_t phys_addr, size_t virt_addr);
+extern int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr);
 
 /* Physical memory discovery operations, generally provided by the platform */
 
 typedef struct {
-	void *phys_mem_start;
-	void *phys_mem_end;
+	uintptr_t phys_mem_start;
+	uintptr_t phys_mem_end;
 	
 	void *next_mem;
 	

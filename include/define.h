@@ -13,6 +13,7 @@ typedef signed int int32_t;
 typedef signed long long int int64_t;
 
 typedef unsigned long size_t;
-typedef unsigned long intptr_t;
+typedef signed long intptr_t;
+typedef unsigned long uintptr_t;
 
 #endif /* DEFINE_H */

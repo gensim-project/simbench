@@ -1,4 +1,5 @@
 #include "mem.h"
+#include "string.h"
 
 //#define DEBUG_MMU
 
@@ -32,9 +33,9 @@ static void write_dacr(uint32_t dacr_val)
 
 extern void *vectors_start, *vectors_end, *_TEXT_START, *_TEXT_END, *_DATA_START, *_DATA_END;
 
-static int mem_create_region_id_mapping(size_t region_start, size_t region_end)
+static int mem_create_region_id_mapping(uintptr_t region_start, uintptr_t region_end)
 {
-	size_t i;
+	uintptr_t i;
 	size_t page_size = mem_get_page_size();
 	
 	region_start &= ~(page_size-1);
@@ -56,19 +57,16 @@ void mem_init()
 	bzero((void*)section_table, sizeof(section_table));
 	
 	// Initialise page table with mappings for code and data sections
-	size_t page_size = mem_get_page_size();
-	size_t i;
-
 	DEBUG("Mapping vectors\n");
-	mem_create_region_id_mapping(&vectors_start, &vectors_end);
+	mem_create_region_id_mapping((uintptr_t)&vectors_start, (uintptr_t)&vectors_end);
 
 	DEBUG("Mapping text\n");
-	mem_create_region_id_mapping(&_TEXT_START, &_TEXT_END);
+	mem_create_region_id_mapping((uintptr_t)&_TEXT_START, (uintptr_t)&_TEXT_END);
 	
 	DEBUG("Mapping data\n");
-	mem_create_region_id_mapping(&_DATA_START, &_DATA_END);
+	mem_create_region_id_mapping((uintptr_t)&_DATA_START, (uintptr_t)&_DATA_END);
 	
-	phys_mem_info_t *dev_info = mem_get_device_info();
+	const phys_mem_info_t *dev_info = mem_get_device_info();
 	DEBUG("Mapping devices\n");
 	while(dev_info) {
 		mem_create_region_id_mapping(dev_info->phys_mem_start, dev_info->phys_mem_end);
@@ -108,7 +106,7 @@ void mem_tlb_flush()
 	asm("mcr p15, 0, r0, cr8, cr7, 0" :::);
 }
 
-void mem_tlb_evict(void *ptr)
+void mem_tlb_evict(uintptr_t ptr)
 {
 	asm("mcr p15, 0, %0, cr8, cr7, 1" ::"r"(ptr):);
 }
@@ -119,7 +117,7 @@ size_t mem_get_page_size()
 	return 1 << 20;
 }
 
-int mem_create_page_mapping(size_t phys_addr, size_t virt_addr)
+int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	// Ensure that phys and virt addrs are page aligned
 	if(phys_addr & (mem_get_page_size()-1) || virt_addr & (mem_get_page_size()-1)) return 1;

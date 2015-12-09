@@ -13,11 +13,11 @@ static void kernel_mmu_init()
 	mem_init();
 
 	// Map physical memory into a virtual memory region
-	phys_mem_info_t *phys_mem = mem_get_phys_info();
+	const phys_mem_info_t *phys_mem = mem_get_phys_info();
 	virt_start = 0x40000000;
 	
-	size_t ptr = phys_mem->phys_mem_start;
-	size_t vptr = virt_start;
+	uintptr_t ptr = phys_mem->phys_mem_start;
+	uintptr_t vptr = virt_start;
 	size_t pagesize = mem_get_page_size();
 	while(ptr < phys_mem->phys_mem_end) {
 		mem_create_page_mapping(ptr, vptr);
@@ -35,7 +35,7 @@ static void kernel_mmu()
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
 	uint32_t i;
 
-	size_t ptr = virt_start;
+	uintptr_t ptr = virt_start;
 	size_t pagesize = mem_get_page_size();
 	
 	for(i = 0; i < total_iterations; ++i) {
