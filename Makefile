@@ -30,8 +30,8 @@ SIMBENCH_BUILTINS	:= $(patsubst %, %/built-in.o, $(SIMBENCH_DIRS))
 SIMBENCH_CLEAN_DIRS	:= $(patsubst %,__clean-%,$(SIMBENCH_DIRS))
 	
 # Build Configuration
--include $(ARCHDIR)/Make.config
--include $(PLATFORMDIR)/Make.simbench
+include $(ARCHDIR)/Make.config
+include $(PLATFORMDIR)/Make.simbench
 
 %/built-in.o: .FORCE
 	@make -f build/Makefile.build DIR=$(dir $@) __build

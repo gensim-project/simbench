@@ -1,7 +1,7 @@
+#include "arch.h"
 #include "benchmark.h"
 
 #define CODEGEN_ITERATIONS 1
-#define NOINLINE __attribute__((noinline))
 
 static benchmark_kernel_t volatile fn_table[];
 
@@ -20,12 +20,13 @@ static benchmark_kernel_t volatile fn_table[] = {
 	};
 
 // Make the code region dirty, so that it will be retranslated next time it is executed
-static void copy_code()
+static void ALIGN copy_code()
 {
 	int i = 0;
 	for(i=0; i < sizeof(fn_table)/sizeof(*fn_table); ++i) {
 		volatile uint8_t* fn_head = (volatile uint8_t*)fn_table[i];
 		*fn_head = *fn_head;
+		arch_code_flush((size_t)fn_head);
 	}
 }
 
@@ -43,14 +44,14 @@ static void kernel_init()
 	}
 }
 
-static void kernel()
+static void ALIGN kernel()
 {
 	uint32_t i;
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
 	
 	for(i = 0; i < total_iterations; ++i) {
-		copy_code();
 		run_code();
+		copy_code();
 	}
 }
 

@@ -1,7 +1,6 @@
 #include "benchmark.h"
 
 #define DISPATCH_ITERATIONS 100
-#define ALIGN __attribute__((aligned(4096)))
 
 #define leaf_fn(x) static void ALIGN fn ## x() {}
 
