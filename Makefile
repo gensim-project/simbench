@@ -1,4 +1,4 @@
-ARCH ?= `uname -m`
+ARCH ?= $(shell uname -m)
 PLATFORM ?= none
 
 BENCHMARKS=
