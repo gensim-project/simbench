@@ -1,18 +1,27 @@
+DIR := $(patsubst %/,%,$(DIR))
+
 -include $(DIR)/Makefile
 
 REAL_BUILTIN := $(DIR)/built-in.o
 REAL_OBJ := $(patsubst %,$(DIR)/%,$(OBJ))
 
-__build: $(REAL_BUILTIN)
+__build: $(REAL_BUILTIN) .FORCE
+	@echo -n
+
+-include $(REAL_OBJ:.o=.d)
 
 $(REAL_BUILTIN): $(REAL_OBJ)
-	@echo "  LD      $@"
+	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
 	$(Q)$(LD) -r -o $@ $(REAL_OBJ)
 
 %.o: %.S
-	@echo "  AS      $@"
+	@echo "  AS      $(patsubst $(BASEDIR)/%,%,$@)"
 	$(Q)$(CC) -c -o $@ $(CFLAGS) $<
+	$(Q)$(CC) -MM -MT "$@" $< $(CFLAGS) > $(@:.o=.d)
 
 %.o: %.c
-	@echo "  CC      $@"
+	@echo "  CC      $(patsubst $(BASEDIR)/%,%,$@)"
 	$(Q)$(CC) -c -o $@ $(CFLAGS) $<
+	$(Q)$(CC) -MM -MT "$@" $< $(CFLAGS) > $(@:.o=.d)
+
+.PHONY: .FORCE

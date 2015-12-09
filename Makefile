@@ -1,4 +1,4 @@
-export MAKEFLAGS += -rR --no-print-directory -s
+export MAKEFLAGS += -rR --no-print-directory
 export Q := @
 	
 # Architecture/Platform Selection
@@ -43,7 +43,7 @@ clean: $(SIMBENCH_CLEAN_DIRS) .FORCE
 	rm -rf out
 
 $(SIMBENCH_CLEAN_DIRS): .FORCE
-	-make -f build/Makefile.clean DIR=$(patsubst __clean-%,%,$@) __clean
+	@make -f build/Makefile.clean DIR=$(patsubst __clean-%,%,$@) __clean
 
 $(ARCHOUTDIR): .FORCE
 	@echo "  MKDIR   $(patsubst $(BASEDIR)/%,%,$@)"
