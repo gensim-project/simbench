@@ -1,5 +1,3 @@
-include $(BASEDIR)/arch/$(ARCH)/Make.config
-
-out/arm/versatile/simbench : $(ARCH_A) $(PLATFORM_A) $(HARNESS_A) $(BMARKS_A)
-	mkdir -p `dirname $@`
-	$(LD) -nostdlib -T platform/arm/versatile/sys.ld $(LDFLAGS) $^ -o $@
+$(SIMBENCH_APP): $(ARCH_A) $(PLATFORM_A) $(HARNESS_A) $(BMARKS_A)
+	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)$(LD) -nostdlib -T platform/arm/versatile/sys.ld $(LDFLAGS) $^ -o $@

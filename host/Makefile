@@ -1,6 +1,6 @@
 
 host : main.c
-	gcc $^ -o $@ -O3
+	gcc $^ -o $@ -O3 -lrt
 
 clean:
-	rm host
+	rm -f host

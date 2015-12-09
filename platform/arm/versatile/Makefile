@@ -1,13 +1,10 @@
-AS=arm-unknown-eabi-as
-LD=arm-unknown-eabi-ld
-CC=arm-unknown-eabi-gcc
-
-CFLAGS=-I$(BASEDIR)/include
+-include $(BASEDIR)/Make.include
 
 PLATFORM_O := uart.o platform.o mem.o
 
-platform.a : $(PLATFORM_O)
-	ar q $@ $^
+$(PLATFORM_A): $(PLATFORM_O)
+	@echo "  AR      $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)$(AR) rc $@ $^
 
 clean:
-	rm -f $(PLATFORM_O) platform.a
+	rm -f $(PLATFORM_O) $(PLATFORM_A)

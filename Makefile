@@ -1,37 +1,71 @@
-ARCH ?= $(shell uname -m)
-PLATFORM ?= none
+export MAKEFLAGS += -rR --no-print-directory
+export Q := @
+	
+# Architecture/Platform Selection
+export ARCH	?= $(shell uname -m)
+export PLATFORM	?= none
 
-BENCHMARKS=
-export BASEDIR=$(CURDIR)
+# Directory Configuration
+export BENCHMARKS   :=
+export BASEDIR	    := $(CURDIR)
+export PLATFORMDIR  := $(BASEDIR)/platform/$(ARCH)/$(PLATFORM)
+export ARCHDIR	    := $(BASEDIR)/arch/$(ARCH)
+export TOPOUTDIR    := $(BASEDIR)/out
+export ARCHOUTDIR   := $(TOPOUTDIR)/$(ARCH)
+export PLATOUTDIR   := $(ARCHOUTDIR)/$(PLATFORM)
+export HARNESSDIR   := $(BASEDIR)/harness
+export BMARKDIR	    := $(BASEDIR)/benchmarks
+export INCDIR	    := $(BASEDIR)/include
+	
+# Main Rule
+SIMBENCH_APP	:= $(PLATOUTDIR)/simbench
+HOST_APP	:= $(TOPOUTDIR)/host	
 
-all : out/$(ARCH)/$(PLATFORM)/simbench host/host
+all: $(SIMBENCH_APP) $(HOST_APP)
+	
+# Components
+export PLATFORM_A   := $(PLATOUTDIR)/platform.a
+export ARCH_A	    := $(ARCHOUTDIR)/arch.a
+export HARNESS_A    := $(ARCHOUTDIR)/harness.a
+export BMARKS_A	    := $(ARCHOUTDIR)/benchmarks.a
 
-PLATFORM_A = platform/$(ARCH)/$(PLATFORM)/platform.a
-ARCH_A = arch/$(ARCH)/arch.a
-HARNESS_A = out/$(ARCH)/harness.a
-BMARKS_A = out/$(ARCH)/benchmarks.a
+# Build Configuration
+-include $(ARCHDIR)/Make.config
+-include $(PLATFORMDIR)/Make.simbench
 
-include platform/$(ARCH)/$(PLATFORM)/Make.simbench
+$(ARCH_A): $(ARCHOUTDIR)
+	@make -C $(ARCHDIR)
 
-$(ARCH_A) : 
-	make -C arch/$(ARCH)
+$(PLATFORM_A): $(PLATOUTDIR)
+	@make -C $(PLATFORMDIR)
 
-$(PLATFORM_A) : 
-	make -C platform/$(ARCH)/$(PLATFORM)
+$(HARNESS_A): $(ARCHOUTDIR)
+	@make -C $(HARNESSDIR)
 
-$(HARNESS_A) :
-	make -C harness/
+$(BMARKS_A): $(ARCHOUTDIR)
+	@make -C $(BMARKDIR)
 
-$(BMARKS_A) : 
-	make -C benchmarks/
-
-host/host : 
-	make -C host
+$(HOST_APP): $(TOPOUTDIR)
+	@make -C host
 
 clean:
-	-make -C arch/$(ARCH) clean
-	-make -C platform/$(ARCH)/$(PLATFORM) clean
-	-make -C harness/ clean
-	-make -C benchmarks/ clean
+	-make -C $(ARCHDIR) clean
+	-make -C $(PLATFORMDIR) clean
+	-make -C $(HARNESSDIR) clean
+	-make -C $(BMARKDIR) clean
 	-make -C host/ clean
 	rm -rf out
+	
+$(ARCHOUTDIR): .FORCE
+	@echo "  MKDIR   $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)mkdir -p $@
+
+$(PLATOUTDIR): .FORCE
+	@echo "  MKDIR   $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)mkdir -p $@
+
+$(TOPOUTDIR): .FORCE
+	@echo "  MKDIR   $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)mkdir -p $@
+
+.PHONY: .FORCE

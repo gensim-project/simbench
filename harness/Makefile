@@ -1,11 +1,10 @@
-include $(BASEDIR)/arch/$(ARCH)/Make.config
+-include $(BASEDIR)/Make.include
 
 HARNESS_O := harness.o
-HARNESS_A := $(BASEDIR)/out/$(ARCH)/harness.a
 
-$(HARNESS_A) : $(HARNESS_O)
-	mkdir -p $(BASEDIR)/out/$(ARCH)
-	ar q $@ $^
+$(HARNESS_A): $(HARNESS_O)
+	@echo "  AR      $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)$(AR) rc $@ $^
 
 clean:
 	rm -f $(HARNESS_O) $(HARNESS_A)

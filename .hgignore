@@ -3,3 +3,4 @@ syntax:regexp
 \.o$
 ^out/
 host/host
+nbproject
