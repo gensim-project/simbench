@@ -1,0 +1,12 @@
+-include $(DIR)/Makefile
+
+REAL_OBJ := $(patsubst %,$(DIR)/%,$(OBJ))
+REAL_BUILTIN := $(DIR)/built-in.o
+
+__clean: .FORCE
+	@echo "  RM      $(REAL_BUILTIN)"
+	rm -f $(REAL_BUILTIN)
+	@echo "  RM      $(REAL_OBJ)"
+	rm -f $(REAL_OBJ)
+
+.PHONY: .FORCE

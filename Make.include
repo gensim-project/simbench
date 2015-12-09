@@ -1,7 +1,0 @@
-%.o: %.c
-	@echo "  CC      $(patsubst $(BASEDIR)/%,%,$@)"
-	$(Q)$(CC) -c -o $@ $(CFLAGS) $<
-
-%.o: %.S
-	@echo "  AS      $(patsubst $(BASEDIR)/%,%,$@)"
-	$(Q)$(CC) -c -o $@ $(CFLAGS) $<

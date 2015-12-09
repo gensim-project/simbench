@@ -24,38 +24,27 @@ HOST_APP	:= $(TOPOUTDIR)/host
 all: $(SIMBENCH_APP) $(HOST_APP)
 	
 # Components
-export PLATFORM_A   := $(PLATOUTDIR)/platform.a
-export ARCH_A	    := $(ARCHOUTDIR)/arch.a
-export HARNESS_A    := $(ARCHOUTDIR)/harness.a
-export BMARKS_A	    := $(ARCHOUTDIR)/benchmarks.a
-
+SIMBENCH_DIRS		:= $(ARCHDIR) $(BMARKDIR) $(HARNESSDIR) $(PLATFORMDIR)
+SIMBENCH_BUILTINS	:= $(patsubst %, %/built-in.o, $(SIMBENCH_DIRS))
+SIMBENCH_CLEAN_DIRS	:= $(patsubst %,__clean-%,$(SIMBENCH_DIRS))
+	
 # Build Configuration
 -include $(ARCHDIR)/Make.config
 -include $(PLATFORMDIR)/Make.simbench
 
-$(ARCH_A): $(ARCHOUTDIR) .FORCE
-	@make -C $(ARCHDIR)
-
-$(PLATFORM_A): $(PLATOUTDIR) .FORCE
-	@make -C $(PLATFORMDIR)
-
-$(HARNESS_A): $(ARCHOUTDIR) .FORCE
-	@make -C $(HARNESSDIR)
-
-$(BMARKS_A): $(ARCHOUTDIR) .FORCE
-	@make -C $(BMARKDIR)
+%/built-in.o: .FORCE
+	@make -f build/Makefile.build DIR=$(dir $@) __build
 
 $(HOST_APP): $(TOPOUTDIR) .FORCE
 	@make -C host
 
-clean:
-	-make -C $(ARCHDIR) clean
-	-make -C $(PLATFORMDIR) clean
-	-make -C $(HARNESSDIR) clean
-	-make -C $(BMARKDIR) clean
+clean: $(SIMBENCH_CLEAN_DIRS) .FORCE
 	-make -C host/ clean
 	rm -rf out
-	
+
+$(SIMBENCH_CLEAN_DIRS): .FORCE
+	-make -f build/Makefile.clean DIR=$(patsubst __clean-%,%,$@) __clean
+
 $(ARCHOUTDIR): .FORCE
 	@echo "  MKDIR   $(patsubst $(BASEDIR)/%,%,$@)"
 	$(Q)mkdir -p $@

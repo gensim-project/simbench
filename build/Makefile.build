@@ -1,0 +1,18 @@
+-include $(DIR)/Makefile
+
+REAL_BUILTIN := $(DIR)/built-in.o
+REAL_OBJ := $(patsubst %,$(DIR)/%,$(OBJ))
+
+__build: $(REAL_BUILTIN)
+
+$(REAL_BUILTIN): $(REAL_OBJ)
+	@echo "  LD      $@"
+	$(Q)$(LD) -r -o $@ $(REAL_OBJ)
+
+%.o: %.S
+	@echo "  AS      $@"
+	$(Q)$(CC) -c -o $@ $(CFLAGS) $<
+
+%.o: %.c
+	@echo "  CC      $@"
+	$(Q)$(CC) -c -o $@ $(CFLAGS) $<

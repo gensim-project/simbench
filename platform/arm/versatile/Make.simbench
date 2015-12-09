@@ -1,3 +1,4 @@
-$(SIMBENCH_APP): $(ARCH_A) $(PLATFORM_A) $(HARNESS_A) $(BMARKS_A)
+$(SIMBENCH_APP): $(SIMBENCH_BUILTINS)
+	@mkdir -p $(PLATOUTDIR)
 	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
 	$(Q)$(LD) -nostdlib -T platform/arm/versatile/sys.ld $(LDFLAGS) $^ -o $@
