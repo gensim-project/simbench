@@ -1,8 +1,6 @@
 #include "benchmark.h"
 #include "mem.h"
 
-#include <stdint.h>
-
 #define MEMORY_BENCHMARK_ITERATIONS 2000
 #define VIRT_BASE 0x40000000
 

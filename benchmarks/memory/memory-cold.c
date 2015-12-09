@@ -1,7 +1,5 @@
 #include "benchmark.h"
 
-#include <stdint.h>
-
 #define MEMORY_BENCHMARK_ITERATIONS 2
 
 asm (".align 12\n");

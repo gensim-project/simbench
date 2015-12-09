@@ -1,6 +1,8 @@
 #ifndef BENCHMARK_H
 #define BENCHMARK_H
 
+#include "define.h"
+
 #define BENCHMARK_ITERATIONS 1000
 
 typedef void (*benchmark_kernel_t)();

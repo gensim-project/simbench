@@ -1,4 +1,4 @@
-export MAKEFLAGS += -rR --no-print-directory
+export MAKEFLAGS += -rR --no-print-directory -s
 export Q := @
 	
 # Architecture/Platform Selection
@@ -33,19 +33,19 @@ export BMARKS_A	    := $(ARCHOUTDIR)/benchmarks.a
 -include $(ARCHDIR)/Make.config
 -include $(PLATFORMDIR)/Make.simbench
 
-$(ARCH_A): $(ARCHOUTDIR)
+$(ARCH_A): $(ARCHOUTDIR) .FORCE
 	@make -C $(ARCHDIR)
 
-$(PLATFORM_A): $(PLATOUTDIR)
+$(PLATFORM_A): $(PLATOUTDIR) .FORCE
 	@make -C $(PLATFORMDIR)
 
-$(HARNESS_A): $(ARCHOUTDIR)
+$(HARNESS_A): $(ARCHOUTDIR) .FORCE
 	@make -C $(HARNESSDIR)
 
-$(BMARKS_A): $(ARCHOUTDIR)
+$(BMARKS_A): $(ARCHOUTDIR) .FORCE
 	@make -C $(BMARKDIR)
 
-$(HOST_APP): $(TOPOUTDIR)
+$(HOST_APP): $(TOPOUTDIR) .FORCE
 	@make -C host
 
 clean:

@@ -3,9 +3,9 @@
 
 #include "benchmark.h"
 
-void harness_init();
-void harness_register_benchmark(benchmark_t *benchmark);
-void harness_main();
-void harness_execute(benchmark_t *benchmark);
+extern void harness_init();
+extern void harness_register_benchmark(benchmark_t *benchmark);
+extern void harness_main();
+extern void harness_execute(benchmark_t *benchmark);
 
 #endif

@@ -1,8 +1,5 @@
 #include "benchmark.h"
 
-#include <stdint.h>
-#include <string.h>
-
 #define CODEGEN_ITERATIONS 1
 #define NOINLINE __attribute__((noinline))
 

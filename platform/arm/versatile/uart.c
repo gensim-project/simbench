@@ -1,7 +1,5 @@
 #include "uart.h"
 
-#include <stdint.h>
-
 #define UART_BASE 0x101f1000
 
 struct uart_regs_t

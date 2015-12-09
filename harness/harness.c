@@ -1,8 +1,6 @@
 #include "uart.h"
 #include "harness.h"
 
-#include <stdint.h>
-
 #define MAX_BENCHMARKS 100
 
 typedef void (*ctor_t)();

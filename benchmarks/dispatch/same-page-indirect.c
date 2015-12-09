@@ -1,7 +1,5 @@
 #include "benchmark.h"
 
-#include <stdint.h>
-
 #define NOREORDER 
 //#define NOREORDER __attribute__((no_reorder))
 

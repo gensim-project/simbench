@@ -1,7 +1,5 @@
 #include "benchmark.h"
 
-#include <stdint.h>
-
 #define DISPATCH_ITERATIONS 100
 #define ALIGN __attribute__((aligned(4096)))
 

@@ -1,8 +1,5 @@
 #include "mem.h"
 
-#include <string.h>
-#include <stddef.h>
-
 //#define DEBUG_MMU
 
 #ifdef DEBUG_MMU
