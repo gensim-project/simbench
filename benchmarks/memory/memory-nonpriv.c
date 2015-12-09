@@ -1,27 +1,17 @@
 #include "benchmark.h"
 #include "mem.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 200000
+#define MEMORY_BENCHMARK_ITERATIONS 100000
 
 static volatile uint32_t value = 0;
 
-asm (".align 12\n");
 static void ALIGN kernel()
 {
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
 	uint32_t i;
 		
 	for(i = 0; i < total_iterations; ++i) {
-		value = value;
-		value = value;
-		value = value;
-		value = value;
-		value = value;
-		value = value;
-		value = value;
-		value = value;
-		value = value;
-		value = value;
+		arch_nonpriviliged_write(&value);
 	}
 }
 
@@ -40,19 +30,12 @@ static void kernel_mmu_cleanup()
 	mem_reset();
 }
 
-static benchmark_t bmark = {
-	.name="Memory-Hot-NoMMU",
-	.category="Memory",
-	.kernel=kernel
-};
-
 static benchmark_t bmark_mmu = {
-	.name="Memory-Hot-MMU",
+	.name="Memory-NonPriv",
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel,
 	.kernel_cleanup=kernel_mmu_cleanup
 };
 
-REG_BENCHMARK(bmark);
 REG_BENCHMARK(bmark_mmu);
