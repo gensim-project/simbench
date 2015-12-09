@@ -1,6 +1,6 @@
 #include "string.h"
 
-void *memset(void *s, int c, size_t n)
+void * __weak memset(void *s, int c, size_t n)
 {
 	volatile char *_s = (char*)s;
 	char b = c & 0xff;
@@ -11,4 +11,9 @@ void *memset(void *s, int c, size_t n)
 		n--;
 	}
 	return s;
+}
+
+void __weak bzero(void *s, size_t n)
+{
+	memset(s, 0, n);
 }

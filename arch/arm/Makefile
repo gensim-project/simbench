@@ -1,1 +1,1 @@
-OBJ := reset.o vector-handlers.o vectors.o arch.o mem.o memset.o memcpy.o
+OBJ := reset.o vector-handlers.o vectors.o arch.o mem.o

@@ -15,6 +15,7 @@ export ARCHOUTDIR   := $(TOPOUTDIR)/$(ARCH)
 export PLATOUTDIR   := $(ARCHOUTDIR)/$(PLATFORM)
 export HARNESSDIR   := $(BASEDIR)/harness
 export BMARKDIR	    := $(BASEDIR)/benchmarks
+export UTILDIR	    := $(BASEDIR)/util
 export INCDIR	    := $(BASEDIR)/include
 	
 # Main Rule
@@ -24,7 +25,7 @@ HOST_APP	:= $(TOPOUTDIR)/host
 all: $(SIMBENCH_APP) $(HOST_APP)
 	
 # Components
-SIMBENCH_DIRS		:= $(ARCHDIR) $(BMARKDIR) $(HARNESSDIR) $(PLATFORMDIR)
+SIMBENCH_DIRS		:= $(ARCHDIR) $(BMARKDIR) $(HARNESSDIR) $(PLATFORMDIR) $(UTILDIR)
 SIMBENCH_BUILTINS	:= $(patsubst %, %/built-in.o, $(SIMBENCH_DIRS))
 SIMBENCH_CLEAN_DIRS	:= $(patsubst %,__clean-%,$(SIMBENCH_DIRS))
 	

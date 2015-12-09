@@ -16,4 +16,7 @@ typedef unsigned long size_t;
 typedef signed long intptr_t;
 typedef unsigned long uintptr_t;
 
+// attributes
+#define __weak __attribute__((weak))
+
 #endif /* DEFINE_H */
