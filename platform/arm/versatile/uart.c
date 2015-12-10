@@ -1,6 +1,5 @@
 #include "uart.h"
-
-#define UART_BASE 0x101f1000
+#include "constants.h"
 
 struct uart_regs_t
 {
@@ -29,7 +28,7 @@ void uart_init()
 
 void uart_putc(char c)
 {
-	struct uart_regs_t *regs = (struct uart_regs_t*)(UART_BASE);
+	struct uart_regs_t *regs = (struct uart_regs_t*)(UART0_BASE);
 	regs->dr = c;
 }
 
