@@ -1,5 +1,6 @@
 #include "arch.h"
 #include "benchmark.h"
+#include "harness.h"
 
 #include "define.h"
 
@@ -80,7 +81,7 @@ static void ALIGN kernel()
 {
 	uint64_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
 	uint64_t i;
-	volatile uint8_t* block_ptr = block;
+	volatile uint8_t* block_ptr = (volatile uint8_t*)block;
 	
 	for(i=0; i < total_iterations; ++i) {
 		block();

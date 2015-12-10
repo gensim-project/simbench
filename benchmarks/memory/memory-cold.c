@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include "harness.h"
 
 #define MEMORY_BENCHMARK_ITERATIONS 2
 

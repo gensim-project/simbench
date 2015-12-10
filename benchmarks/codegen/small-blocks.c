@@ -1,5 +1,6 @@
 #include "arch.h"
 #include "benchmark.h"
+#include "harness.h"
 
 #define CODEGEN_ITERATIONS 1
 

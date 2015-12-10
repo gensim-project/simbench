@@ -28,6 +28,6 @@ void arch_code_flush(size_t address)
 uint32_t arch_nonpriviliged_write(uint32_t *ptr)
 {
 	uint32_t data;
-	asm("ldrt %0, [%1]" : "=r"(data) : "r"(ptr));
+	asm("ldrt %0, [%1]" : "=&r"(data) : "r"(ptr));
 	return data;
 }

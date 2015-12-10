@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include "harness.h"
 
 #define DISPATCH_ITERATIONS 100
 
