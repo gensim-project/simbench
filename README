@@ -1,0 +1,39 @@
+================================================================================
+
+    SIMBENCH
+
+================================================================================
+
+Simbench is a set of microbenchmarks designed to run on full system simulators,
+in order to evaluate the performance of various features required for full
+system simulation. 
+
+1. Structure of Simbench
+
+Simbench consists of two main components: a Simbench image, plus a host program 
+to time the various benchmarks. Rather than time each benchmark using a timer
+within the simulator (which may not be accurate or properly calibrated), timing
+is performed by the host machine.
+
+2. Compiling Simbench
+
+The actual Simbench image must be compiled for a specific architecture and 
+platform. These are specified via environment variables. For example, to compile
+for the ARM Versatile platform:
+
+$ export ARCH=arm
+$ export PLATFORM=versatile
+$ make
+
+A cross compiler must be available for the target architecture, specified in
+arch/$(ARCH)/Make.config.
+
+3. Running Simbench
+
+To run Simbench for the ARM Versatile platform using QEMU:
+
+$ stdbuf -o0 qemu-system-arm -machine versatileab -kernel out/arm/versatile/simbench -nographic | host/host
+
+The stdbuf program is used to disable output buffering so that the timing 
+information produced by Simbench is delivered to the host application in a 
+timely fashion.
