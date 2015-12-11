@@ -1,0 +1,110 @@
+================================================================================
+
+    SIMBENCH
+
+================================================================================
+
+    Platform : ArndaleBoard
+    Description : 
+     - Samsung Exynos 5250
+     - Listening to the UART2 of the Exynos
+    
+
+================================================================================
+
+== UART Details ==
+
+Base Addresses: 
+     - 0x12C0_0000 (UART0)
+     - 0x12C1_0000 (UART1)
+     - 0x12C2_0000 (UART2)
+     - 0x12C3_0000 (UART3)
+     - 0x1319_0000 (ISP-UART)
+
+Registe	Offset	Description
+ULCON	0x0000	line control
+UCON	0x0004	control
+UFCON	0x0008	FIFO control
+UMCON	0x000C	modem control
+UTRSTAT	0x0010	Tx/Rx status
+UERSTAT	0x0014	Rx error status
+UFSTAT	0x0018	FIFO status
+UMSTAT	0x001C	modem status
+UTXH	0x0020	transmit buffer
+URXH	0x0024	receive	buffer
+UBRDIV	0x0028	baud rate divisor
+UFRACVAL0x002C	divisor	fractional value
+UINTP	0x0030	interrupt pending
+UINTS	0x0034	interrupt source
+UINTM	0x0038	interrupt mask
+
+Reset Value is 0x0000_0000 Except 0x0000_0006 for UTRSTAT and 0x0000_3000 for UCON.
+
+== Running simbench using U-Boot ==
+
+```
+ARNDALE5250 # fatload mmc 0:1 40007000 simBench
+ARNDALE5250 # bootelf 40007000
+```
+
+You can ensure the simbench binarie is properly loaded using :
+
+```
+ARNDALE5250 # md 40007000
+40007000: 464c457f 00010101 00000000 00000000    .ELF............
+...
+```
+
+You can get the Board infos using :
+```
+ARNDALE5250 # mmcinfo
+Device: EXYNOS DWMMC
+Manufacturer ID: 27
+OEM: 5048
+Name: SD08G
+Tran Speed: 50000000
+Rd Block Len: 512
+SD version 2.0
+High Capacity: Yes
+Capacity: 7.4 GiB
+Bus Width: 4-bit
+
+ARNDALE5250 # base
+Base Address: 0x00000000
+ARNDALE5250 # bdinfo
+arch_number = 0x00000EBE
+boot_params = 0x40000100
+DRAM bank   = 0x00000000
+-> start    = 0x40000000
+-> size     = 0x10000000
+DRAM bank   = 0x00000001
+-> start    = 0x50000000
+-> size     = 0x10000000
+DRAM bank   = 0x00000002
+-> start    = 0x60000000
+-> size     = 0x10000000
+DRAM bank   = 0x00000003
+-> start    = 0x70000000
+-> size     = 0x10000000
+DRAM bank   = 0x00000004
+-> start    = 0x80000000
+-> size     = 0x10000000
+DRAM bank   = 0x00000005
+-> start    = 0x90000000
+-> size     = 0x10000000
+DRAM bank   = 0x00000006
+-> start    = 0xA0000000
+-> size     = 0x10000000
+DRAM bank   = 0x00000007
+-> start    = 0xB0000000
+-> size     = 0x10000000
+ethaddr     = XX:XX:XX:XX:XX:XX
+ip_addr     = <NULL>
+baudrate    = 115200 bps
+TLB addr    = 0xBFFF0000
+relocaddr   = 0xBFF78000
+reloc off   = 0x7C178000
+irq_sp      = 0xBFE6FF30
+sp start    = 0xBFE6FF20
+FB base     = 0x00000000
+```
