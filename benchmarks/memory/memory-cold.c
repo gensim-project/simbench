@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include "debug.h"
 #include "harness.h"
 
 #define MEMORY_BENCHMARK_ITERATIONS 2
@@ -13,8 +14,11 @@ static void ALIGN kernel()
 	
 	uint32_t page_size = 4096;
 	
+	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	
 	int it;
 	for(it = 0; it < total_iterations; ++it) {
+		debug_spinner();
 		volatile uint32_t *i;
 		for(i = mem_region_start; i < mem_region_end; i += page_size / sizeof(*i)) {
 			*i = (intptr_t)i;

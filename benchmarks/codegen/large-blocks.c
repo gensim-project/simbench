@@ -1,5 +1,6 @@
 #include "arch.h"
 #include "benchmark.h"
+#include "debug.h"
 #include "harness.h"
 
 #include "define.h"
@@ -83,7 +84,10 @@ static void ALIGN kernel()
 	uint64_t i;
 	volatile uint8_t* block_ptr = (volatile uint8_t*)block;
 	
+	debug_spinner_start(CODEGEN_ITERATIONS);
+	
 	for(i=0; i < total_iterations; ++i) {
+		debug_spinner();
 		block();
 		*block_ptr = *block_ptr;
 		arch_code_flush((size_t)block);

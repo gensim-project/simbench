@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include "debug.h"
 #include "harness.h"
 #include "mem.h"
 
@@ -39,7 +40,11 @@ static void kernel_mmu()
 	size_t ptr = virt_start;
 	size_t pagesize = mem_get_page_size();
 	
+	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	
 	for(i = 0; i < total_iterations; ++i) {
+		debug_spinner();
+		
 		*(uint32_t*)ptr = 0x12345678;
 		ptr += pagesize;
 		if(ptr >= virt_end) ptr = virt_start;
