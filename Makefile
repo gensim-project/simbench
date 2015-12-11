@@ -33,6 +33,11 @@ SIMBENCH_CLEAN_DIRS	:= $(patsubst %,__clean-%,$(SIMBENCH_DIRS))
 include $(ARCHDIR)/Make.config
 include $(PLATFORMDIR)/Make.simbench
 
+# Debugging
+ifeq ($(SIMBENCH_DEBUG),1)
+	export CFLAGS+=-DSIMBENCH_DEBUG
+endif
+
 %/built-in.o: .FORCE
 	@make -f build/Makefile.build DIR=$(dir $@) __build
 

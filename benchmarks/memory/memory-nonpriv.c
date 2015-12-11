@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include "debug.h"
 #include "harness.h"
 #include "mem.h"
 
@@ -11,7 +12,10 @@ static void ALIGN kernel()
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
 	uint32_t i;
 		
+	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+		
 	for(i = 0; i < total_iterations; ++i) {
+		debug_spinner();
 		arch_nonpriviliged_write(&value);
 	}
 }

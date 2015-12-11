@@ -24,6 +24,33 @@ int read_start()
 	return 0;
 }
 
+int read_benchmark_begin()
+{
+	if(fgetc(stdin) != '[') return 1;
+	return 0;
+}
+
+int read_benchmark_end()
+{
+	while(1) {
+		char c = fgetc(stdin);
+		
+		switch(c) {
+			case ']': 
+				return 0;
+			case '|':
+			case '/':
+			case '-':
+			case '\\':
+			case ' ':
+			case 0x08:
+				continue;
+			default: 
+				return 1;
+		}
+	}
+}
+
 int read_benchmark() 
 {
 	char category[128];
@@ -35,9 +62,9 @@ int read_benchmark()
 	
 	printf("%s - %s", category, benchmark);
 	
-	if(fgetc(stdin) != '[') return 1;
+	if(read_benchmark_begin()) return 1;
 	clock_gettime(CLOCK_MONOTONIC, &start_time);
-	if(fgetc(stdin) != ']') return 1;
+	if(read_benchmark_end()) return 1;
 	clock_gettime(CLOCK_MONOTONIC, &end_time);
 	
 	uint64_t start_ticks = start_time.tv_sec*1000000000 + start_time.tv_nsec;

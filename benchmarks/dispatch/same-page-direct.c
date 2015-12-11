@@ -1,4 +1,5 @@
 #include "benchmark.h"
+#include "debug.h"
 #include "harness.h"
 
 #define DISPATCH_ITERATIONS 50000
@@ -91,8 +92,12 @@ static void kernel()
 {
 	uint64_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_ITERATIONS;
 	uint64_t i;
+	
+	debug_spinner_start(DISPATCH_ITERATIONS);
+	
 	for(i=0; i < total_iterations; ++i)
 	{
+		debug_spinner();
 		fn11(i);
 	}
 }
