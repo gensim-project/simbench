@@ -31,6 +31,11 @@ setup_stacks:
 	msr cpsr_c, r0
 	ldr sp, =irq_stack_top
 	
+	//Set up stack for PABT mode
+	mov r0, #0x17
+	msr cpsr_c, r0
+	ldr sp, =pabt_stack_top
+	
 	//restore old mode
 	msr cpsr_c, r1
 	
@@ -66,6 +71,12 @@ stack_top:
 irq_stack_bottom:
 .space 2044
 irq_stack_top:
+.word 0
+
+.align 8
+pabt_stack_bottom:
+.space 2044
+pabt_stack_top:
 .word 0
 
 .align 8
