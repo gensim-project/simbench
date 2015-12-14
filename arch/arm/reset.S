@@ -6,6 +6,8 @@ reset_handler:
 	bl setup_stacks
 	bl load_vectors
 	
+	bl enable_caches
+	
 	bl arch_init
 	bl platform_init
 	
@@ -16,6 +18,16 @@ reset_handler:
 1:
 	b 1b
 .size reset_handler, .-reset_handler
+
+enable_caches:
+	// Need to set the C, W, Z, I and L2 bits (2, 3, 11, 12, 26) of system control register
+	// 0400180c
+	mrc p15, 0, r0, cr1, cr0, 0
+	ldr r1, =0x0400180c
+	orr r0, r1
+	mcr p15, 0, r0, cr1, cr0, 0
+	bx lr
+.ltorg
 
 setup_stacks:
 	//Back up old cpsr
