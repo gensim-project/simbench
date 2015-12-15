@@ -1,0 +1,4 @@
+$(SIMBENCH_APP): $(SIMBENCH_BUILTINS)
+	@mkdir -p $(PLATOUTDIR)
+	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)$(LD) -nostdlib -T platform/arm/realview-pba8/sys.ld $(LDFLAGS) $^ -o $@
