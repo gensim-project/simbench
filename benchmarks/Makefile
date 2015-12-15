@@ -5,10 +5,10 @@ exception-benchmarks := exception/dfault.o exception/ifault.o
 io-benchmarks := io/device-access.o
 
 benchmarks :=
-#benchmarks += $(exception-benchmarks)
-#benchmarks += $(codegen-benchmarks)
-#benchmarks += $(dispatch-benchmarks)
-#benchmarks += $(mem-benchmarks)
+benchmarks += $(exception-benchmarks)
+benchmarks += $(codegen-benchmarks)
+benchmarks += $(dispatch-benchmarks)
+benchmarks += $(mem-benchmarks)
 benchmarks += $(io-benchmarks)
 
 OBJ := $(benchmarks)
