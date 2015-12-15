@@ -26,13 +26,13 @@ void harness_main()
 {	
 	int i = 0;
 	
-	uart_puts("\\\\BENCHMARKS BEGIN\n");
+	uart_puts("\\\\BENCHMARKS BEGIN\n\r");
 	
 	for(i = 0; i < num_benchmarks; ++i) {
 		harness_execute(benchmarks[i]);
 	}
 	
-	uart_puts("\\\\BENCHMARKS END\n");
+	uart_puts("\\\\BENCHMARKS END\n\r");
 }
 
 void harness_register_benchmark(benchmark_t *benchmark)
@@ -50,7 +50,7 @@ void harness_execute(benchmark_t *benchmark)
 	
 	uart_puts(" [");
 	benchmark->kernel();
-	uart_puts("]\n");
+	uart_puts("]\n\r");
 	
 	if(benchmark->kernel_cleanup) benchmark->kernel_cleanup();
 }
