@@ -42,3 +42,18 @@ timely fashion.
 
 Simbench has built in lightweight logging. To enable the debugging logs, define
 the environment variable SIMBENCH_DEBUG=1.
+
+5. Supported environments
+
+Simbench should be executable on a variety of architectures and platforms. The
+requirements placed on the platform are quite small, so porting to a new 
+platform should be quite straightforward. Porting to a new architecture is a 
+little more involved (and requires booting from reset, setting up page tables,
+etc) but should not be too much work.
+
+So far, the following architectures and platforms are supported:
+
+ARM:
+	Versatile Application Baseboard
+	Realview Platform Baseboard (A8)
+	Arndale Board
