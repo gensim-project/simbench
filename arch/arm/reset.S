@@ -58,18 +58,26 @@ setup_stacks:
 .size setup_stacks,.-setup_stacks
 
 
+// Load vectors to location given by linker script (_VECTORS_RELOCATE)
+.extern _VECTORS_RELOCATE
+.extern vectors_start
+.extern vectors_end
 load_vectors:
-	ldr r0, =vectors_start
-	ldr r1, =vectors_end
-	mov r3, #0
-
-1:
-	ldr r2, [r0], #4
-	str r2, [r3], #4
-	cmp r0, r1
-	bne 1b
-
-	bx lr
+	mov r5, lr
+	ldr r0, =_VECTORS_RELOCATE
+	
+	ldr r1, =vectors_start
+	ldr r2, =vectors_end
+	sub r2, r1
+	
+	bl memcpy
+	
+// Also switch on relocated vectors
+	mrc p15, 0, r0, cr1, cr0, 0
+	orr r0, #(1 << 13)
+	mcr p15, 0, r0, cr1, cr0, 0
+	
+	bx r5
 
 
 .data

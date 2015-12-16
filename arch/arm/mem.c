@@ -20,6 +20,8 @@ static uint32_t section_table[1 << 12] __attribute__((aligned(16384)));
 // mcr p15, 0, Rd, CRn, CRm, opc2
 // Unless specified, CRm and opc2 SBZ
 
+extern uint32_t _VECTORS_RELOCATE;
+
 static void write_ttbr(void* ttbr_val)
 {
 	// mcr something something
@@ -86,6 +88,50 @@ void mem_init()
 		dev_info = dev_info->next_mem;
 	}
 	
+	// Attempt to map exception vectors
+	// First, determine whether vectors are high or low
+	uint32_t ctrl;
+	uintptr_t vector_vaddr;
+	uintptr_t vector_vpage;
+	uintptr_t vector_paddr = (uintptr_t)&_VECTORS_RELOCATE;
+	uintptr_t vector_ppage = vector_paddr & ~(mem_get_page_size()-1);
+	asm("mrc p15, 0, %0, cr1, cr0, 0\n" : "=r"(ctrl));
+	DEBUG("Got control word ");
+	DEBUGX(ctrl);
+	DEBUG("\n\r");
+	if(ctrl & (1 << 13)) {
+		// Vectors are high
+		vector_vaddr = 0xffff0000;
+		vector_vpage = vector_vaddr & ~(mem_get_page_size()-1);
+		DEBUG("High vectors detected\n");
+		DEBUGX(vector_vaddr);
+		
+	} else {
+		// Vectors are low
+		vector_vaddr = 0;
+		vector_vpage = 0;
+		DEBUG("Low vectors detected\n");
+	}
+	
+	// Make sure that low bits of virtual and physical vector bases match
+	if((vector_vaddr & (mem_get_page_size()-1)) != (vector_paddr & (mem_get_page_size()-1))) {
+		uart_puts("Unable to map vectors: virtual and physical page offsets do not match!\n\r");
+		uart_puthex((vector_vaddr & (mem_get_page_size()-1)));
+		uart_puts("\n\r");
+		uart_puthex((vector_paddr & (mem_get_page_size()-1)));
+		uart_puts("\n\r");
+		while(1) ;
+	}
+	
+	DEBUG("Mapping vectors\n\r");	
+	mem_create_page_mapping(vector_ppage, vector_vpage);
+	
+	// Also ID map the physical location of the vectors
+	uint32_t vectorstart = (uintptr_t)&_VECTORS_RELOCATE & ~(mem_get_page_size()-1);
+	mem_create_region_id_mapping(vectorstart, vectorstart + mem_get_page_size());
+	
+	// (Note that the vectors now have two virtual mappings: one with VA=PA, and one with VA=Exception Vector Base)
+	
 	DEBUG("Writing DACR\n\r");
 	write_dacr(0xffffffff);
 	
@@ -132,14 +178,17 @@ size_t mem_get_page_size()
 
 int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 {
-	// Ensure that phys and virt addrs are page aligned
-	if(phys_addr & (mem_get_page_size()-1) || virt_addr & (mem_get_page_size()-1)) return 1;
-	
 	DEBUG("\n\rMapping ");
 	DEBUGX(phys_addr);
 	DEBUG(" to ");
 	DEBUGX(virt_addr);
 	DEBUG("\n\r");
+
+	// Ensure that phys and virt addrs are page aligned
+	if(phys_addr & (mem_get_page_size()-1) || virt_addr & (mem_get_page_size()-1)) {
+		DEBUG(" *** TRIED TO MAP A MISALIGNED ADDRESS! *** \n\r");
+		return 1;
+	}
 	
 	// Create a section descriptor pointing to the given physical address
 	// with full access permissions, domain 0, cacheable, buffered (outer and inner write back, no write allocate)
