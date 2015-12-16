@@ -10,7 +10,7 @@ __build: $(REAL_BUILTIN) .FORCE
 
 -include $(REAL_OBJ:.o=.d)
 
-$(REAL_BUILTIN): $(REAL_OBJ)
+$(REAL_BUILTIN): $(DIR)/Makefile $(REAL_OBJ)
 	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
 	$(Q)$(LD) -r -o $@ $(REAL_OBJ)
 

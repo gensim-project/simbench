@@ -6,6 +6,8 @@ reset_handler:
 	bl setup_stacks
 	bl load_vectors
 	
+	bl enable_caches
+	
 	bl arch_init
 	bl platform_init
 	
@@ -16,6 +18,16 @@ reset_handler:
 1:
 	b 1b
 .size reset_handler, .-reset_handler
+
+enable_caches:
+	// Need to set the C, W, Z, I and L2 bits (2, 3, 11, 12, 26) of system control register
+	// 0400180c
+	mrc p15, 0, r0, cr1, cr0, 0
+	ldr r1, =0x0400180c
+	orr r0, r1
+	mcr p15, 0, r0, cr1, cr0, 0
+	bx lr
+.ltorg
 
 setup_stacks:
 	//Back up old cpsr
@@ -30,6 +42,11 @@ setup_stacks:
 	mov r0, #0x12
 	msr cpsr_c, r0
 	ldr sp, =irq_stack_top
+	
+	//Set up stack for PABT mode
+	mov r0, #0x17
+	msr cpsr_c, r0
+	ldr sp, =pabt_stack_top
 	
 	//restore old mode
 	msr cpsr_c, r1
@@ -66,6 +83,12 @@ stack_top:
 irq_stack_bottom:
 .space 2044
 irq_stack_top:
+.word 0
+
+.align 8
+pabt_stack_bottom:
+.space 2044
+pabt_stack_top:
 .word 0
 
 .align 8

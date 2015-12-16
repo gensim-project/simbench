@@ -81,6 +81,7 @@ irq_handler:
 fiq_handler:
 .word default_handler
 
+.globl default_handler
 default_handler:
 	mov r0, #5
 	swi 0x123456

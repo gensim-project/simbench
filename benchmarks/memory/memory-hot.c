@@ -1,4 +1,6 @@
 #include "benchmark.h"
+#include "debug.h"
+#include "harness.h"
 #include "mem.h"
 
 #define MEMORY_BENCHMARK_ITERATIONS 200000
@@ -10,8 +12,11 @@ static void ALIGN kernel()
 {
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
 	uint32_t i;
-		
+	
+	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	
 	for(i = 0; i < total_iterations; ++i) {
+		debug_spinner();
 		value = value;
 		value = value;
 		value = value;

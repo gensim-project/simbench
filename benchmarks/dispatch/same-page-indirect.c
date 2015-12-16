@@ -1,4 +1,6 @@
 #include "benchmark.h"
+#include "debug.h"
+#include "harness.h"
 
 #define NOREORDER 
 //#define NOREORDER __attribute__((no_reorder))
@@ -41,7 +43,11 @@ static void kernel()
 {
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_ITERATIONS;
 	int i = 0;
+	
+	debug_spinner_start(DISPATCH_ITERATIONS);
+	
 	for(i = 0; i < total_iterations; ++i) {
+		debug_spinner();
 		dispatch(1000);
 	}
 }

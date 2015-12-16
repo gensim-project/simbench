@@ -1,0 +1,12 @@
+#ifndef _ARM_CONSTANTS_
+#define _ARM_CONSTANTS_
+
+
+#define PHYS_MEM_START 0x01000000
+#define PHYS_MEM_END   0x09000000
+
+#define UART0_BASE      0x10009000
+#define UART0_MEM_START 0x10009000
+#define UART0_MEM_END   0x10009fff
+
+#endif

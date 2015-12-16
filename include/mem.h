@@ -17,6 +17,7 @@ extern void mem_tlb_evict(uintptr_t ptr);
 
 extern size_t mem_get_page_size();
 extern int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr);
+extern int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr);
 
 /* Physical memory discovery operations, generally provided by the platform */
 

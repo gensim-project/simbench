@@ -1,5 +1,7 @@
 #include "arch.h"
+#include "debug.h"
 #include "benchmark.h"
+#include "harness.h"
 
 #define CODEGEN_ITERATIONS 1
 
@@ -49,7 +51,10 @@ static void ALIGN kernel()
 	uint32_t i;
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
 	
+	debug_spinner_start(CODEGEN_ITERATIONS);
+	
 	for(i = 0; i < total_iterations; ++i) {
+		debug_spinner();
 		run_code();
 		copy_code();
 	}
