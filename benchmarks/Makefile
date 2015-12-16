@@ -7,9 +7,9 @@ exception-benchmarks := exception/dfault.o exception/ifault.o
 io-benchmarks        := io/device-access.o
 
 OBJ :=
-#OBJ += $(exception-benchmarks)
-#OBJ += $(codegen-benchmarks)
-#OBJ += $(dispatch-benchmarks)
-#OBJ += $(mem-benchmarks)
+OBJ += $(exception-benchmarks)
+OBJ += $(codegen-benchmarks)
+OBJ += $(dispatch-benchmarks)
+OBJ += $(mem-benchmarks)
 OBJ += $(io-benchmarks)
 
