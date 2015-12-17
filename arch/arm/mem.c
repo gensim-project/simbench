@@ -56,7 +56,13 @@ static int mem_create_region_device_mapping(uintptr_t region_start, uintptr_t re
 	region_start &= ~(page_size-1);
 	
 	for(i = region_start; i <= region_end; i += page_size) {
-		if(mem_create_page_mapping_device(i, i)) return 1;
+		if(mem_create_page_mapping_device(i, i)) {
+			DEBUG("Failed to map a device at ");
+			DEBUGX(i);
+			DEBUG("!\r\n");
+			
+			return 1;
+		}
 	}
 	return 0;
 }
@@ -103,14 +109,14 @@ void mem_init()
 		// Vectors are high
 		vector_vaddr = 0xffff0000;
 		vector_vpage = vector_vaddr & ~(mem_get_page_size()-1);
-		DEBUG("High vectors detected\n");
+		DEBUG("High vectors detected\r\n");
 		DEBUGX(vector_vaddr);
 		
 	} else {
 		// Vectors are low
 		vector_vaddr = 0;
 		vector_vpage = 0;
-		DEBUG("Low vectors detected\n");
+		DEBUG("Low vectors detected\r\n");
 	}
 	
 	// Make sure that low bits of virtual and physical vector bases match
@@ -202,15 +208,17 @@ int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 
 int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 {
-	// Ensure that phys and virt addrs are page aligned
-	if(phys_addr & (mem_get_page_size()-1) || virt_addr & (mem_get_page_size()-1)) return 1;
-	
-	DEBUG("\r\nMapping ");
+	DEBUG("\r\nMapping Device ");
 	DEBUGX(phys_addr);
 	DEBUG(" to ");
 	DEBUGX(virt_addr);
 	DEBUG("\r\n");
 	
+	// Ensure that phys and virt addrs are page aligned
+	if(phys_addr & (mem_get_page_size()-1) || virt_addr & (mem_get_page_size()-1)) {
+		DEBUG(" *** TRIED TO DEVICE MAP A MISALIGNED ADDRESS! *** \r\n");
+		return 1;
+	}
 	// Create a section descriptor pointing to the given physical address
 	// with full access permissions, domain 0, non cached, non buffered (strongly ordered)
 	uint32_t descriptor = (phys_addr & 0xfff00000) | (0x3 << 10) | 0x2;
