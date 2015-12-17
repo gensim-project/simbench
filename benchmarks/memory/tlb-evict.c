@@ -19,6 +19,9 @@ static void kernel_mmu_init()
 	// Identity map the physical memory region
 	uintptr_t ptr = phys_mem->phys_mem_start;
 	uintptr_t vptr = phys_mem->phys_mem_start;
+	
+	virt_start = vptr;
+	
 	size_t pagesize = mem_get_page_size();
 	while(ptr < phys_mem->phys_mem_end) {
 		mem_create_page_mapping(ptr, vptr);
