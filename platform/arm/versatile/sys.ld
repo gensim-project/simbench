@@ -1,7 +1,10 @@
 SECTIONS 
 {
-	// This needs to have a section offset of 0xf0000, since the high vector location is 0xffff0000.
-	// Also putting this in the linker script is kind of weird.
+	/*
+	This needs to have a section offset of 0xf0000, since the high vector location is 0xffff0000.
+	Also putting this in the linker script is kind of weird.
+	*/
+	
 	_VECTORS_RELOCATE = 0x5f0000;
 	
 	. = 0x00010000;
