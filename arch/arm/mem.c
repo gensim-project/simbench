@@ -190,7 +190,7 @@ void mem_cache_flush()
 	asm("mcr p15, 0, %0, cr7, cr10, 4" :: "r"(0):);
 	
 	// Prefetch Flush
-	asm("mcr p15, 0, %0, cr7, cr5, 0" :: "r"(0):);
+	asm("mcr p15, 0, %0, cr7, cr5, 4" :: "r"(0):);
 }
 
 // Support only 1MB section mappings for now
