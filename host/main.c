@@ -5,7 +5,7 @@
 
 #include <time.h>
 
-#define STR_BENCHMARK_BEGIN "\\\\BENCHMARKS BEGIN\n"
+#define STR_BENCHMARK_BEGIN "\\\\BENCHMARKS BEGIN\r\n"
 
 int read_start()
 {
