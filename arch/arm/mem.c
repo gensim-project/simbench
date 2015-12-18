@@ -156,6 +156,8 @@ void mem_mmu_enable()
 	asm("mrc p15, 0, %0, cr1, cr0, 0" : "=r"(c) ::);
 	c |= 0x1;
 	asm("mcr p15, 0, %0, cr1, cr0, 0" :: "r"(c) :);
+	
+	mem_cache_flush();
 }
 
 void mem_mmu_disable()
@@ -164,6 +166,8 @@ void mem_mmu_disable()
 	asm("mrc p15, 0, %0, cr1, cr0, 0" : "=r"(c) ::);
 	c &= ~0x1;
 	asm("mcr p15, 0, %0, cr1, cr0, 0" :: "r"(c) :);
+	
+	mem_cache_flush();
 }
 
 void mem_tlb_flush()
@@ -174,6 +178,19 @@ void mem_tlb_flush()
 void mem_tlb_evict(uintptr_t ptr)
 {
 	asm("mcr p15, 0, %0, cr8, cr7, 1" ::"r"(ptr):);
+}
+
+void mem_cache_flush()
+{
+	// Clean entire data and unified cache
+	asm("mcr p15, 0, %0, cr7, cr14, 0" :: "r"(0):);
+	asm("mcr p15, 0, %0, cr7, cr15, 0" :: "r"(0):);
+	
+	// Drain write buffer (DSB)
+	asm("mcr p15, 0, %0, cr7, cr10, 4" :: "r"(0):);
+	
+	// Prefetch Flush
+	asm("mcr p15, 0, %0, cr7, cr5, 0" :: "r"(0):);
 }
 
 // Support only 1MB section mappings for now
@@ -220,8 +237,8 @@ int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 		return 1;
 	}
 	// Create a section descriptor pointing to the given physical address
-	// with full access permissions, domain 0, non cached, non buffered (strongly ordered)
-	uint32_t descriptor = (phys_addr & 0xfff00000) | (0x3 << 10) | 0x2;
+	// with full access permissions, domain 0, non cached, buffered (device)
+	uint32_t descriptor = (phys_addr & 0xfff00000) | (0x3 << 10) | 0x4 | 0x2;
 	
 	uint32_t *table_entry_ptr = &section_table[virt_addr >> 20];
 	*table_entry_ptr = descriptor;
