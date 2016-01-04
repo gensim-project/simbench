@@ -1,18 +1,20 @@
 DIR := $(patsubst %/,%,$(DIR))
 
+EXTRA_TARGETS :=
+
 -include $(DIR)/Makefile
 
 REAL_BUILTIN := $(DIR)/built-in.o
 REAL_OBJ := $(patsubst %,$(DIR)/%,$(OBJ))
 
-__build: $(REAL_BUILTIN) .FORCE
+__build: $(REAL_BUILTIN) $(EXTRA_TARGETS) .FORCE
 	@echo -n
 
 -include $(REAL_OBJ:.o=.d)
 
 $(REAL_BUILTIN): $(DIR)/Makefile $(REAL_OBJ)
 	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
-	$(Q)$(LD) -r -o $@ $(REAL_OBJ)
+	$(Q)$(LD) -r -o $@ $(BUILTIN_LDFLAGS) $(REAL_OBJ)
 
 %.o: %.S
 	@echo "  AS      $(patsubst $(BASEDIR)/%,%,$@)"

@@ -7,7 +7,7 @@
 
 #define DISPATCH_ITERATIONS 100
 
-asm (".align 12\n") NOREORDER;
+__align12 NOREORDER;
 
 #define leaf_fn(x) static void NOREORDER fn ## x() {}
 

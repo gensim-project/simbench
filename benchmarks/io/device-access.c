@@ -7,7 +7,7 @@
 
 #define IO_BENCHMARK_ITERATIONS 250000
 
-asm (".align 12\n");
+__align12;
 
 static void ALIGN kernel()
 {

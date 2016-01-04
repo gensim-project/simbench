@@ -4,6 +4,7 @@
 #include "define.h"
 
 extern void arch_init();
+extern void arch_abort() __attribute__((noreturn));
 
 extern void arch_code_flush(size_t address);
 extern uint32_t arch_nonpriviliged_write(uint32_t *ptr);

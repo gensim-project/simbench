@@ -8,7 +8,7 @@
 
 static void (*ptr)() = (void (*))0x40000000;
 
-asm (".align 12\n");
+__align12;
 
 static void ALIGN kernel()
 {

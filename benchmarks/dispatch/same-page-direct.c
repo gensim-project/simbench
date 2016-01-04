@@ -6,7 +6,8 @@
 
 #define NOREORDER 
 #define NOINLINE __attribute__((noinline))
-asm (".align 12\n") NOREORDER;
+
+__align12 NOREORDER;
 
 static volatile uint32_t value;
 

@@ -6,7 +6,7 @@
 #define MEMORY_BENCHMARK_ITERATIONS 2000
 #define VIRT_BASE 0x40000000
 
-asm (".align 12\n");
+__align12;
 
 static size_t virt_start, virt_end;
 
