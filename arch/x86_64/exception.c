@@ -1,5 +1,6 @@
 #include "arch.h"
 #include "x86.h"
+#include "decode.h"
 
 void arch_ifault_install_return()
 {
@@ -13,8 +14,14 @@ void arch_ifault_install_break()
 
 static void skip_handler(struct mcontext *mcontext, uint64_t va)
 {
-	printf("TODO: skip instruction @ rip=%p\n", mcontext->rip);
-	arch_abort();
+	struct instruction inst;
+	
+	if (!decode_instruction((const uint8_t *)mcontext->rip, &inst)) {
+		printf("x86: unable to decode instruction @ %p\n", mcontext->rip);
+		arch_abort();
+	}
+	
+	mcontext->rip += inst.length;
 }
 
 void arch_dfault_install_skip()
