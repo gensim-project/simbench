@@ -8,6 +8,7 @@ enum operand_type
 	OPERAND_REGISTER,
 	OPERAND_IMMEDIATE,
 	OPERAND_MEMORY,
+	OPERAND_MEM_OFF,
 };
 
 typedef enum {
@@ -104,6 +105,8 @@ struct operand
 			int scale;
 			X86Register index;
 		} mem;
+		
+		uint64_t mem_off;
 	};
 };
 

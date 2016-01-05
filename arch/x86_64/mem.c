@@ -39,7 +39,7 @@ void mem_init()
 
 void mem_reset()
 {
-	arch_abort();
+	mem_install_page_fault_handler(default_page_fault_handler);
 }
 
 void mem_mmu_enable()

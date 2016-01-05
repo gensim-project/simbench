@@ -2,9 +2,14 @@
 #include "x86.h"
 #include "decode.h"
 
+static void return_handler(struct mcontext *mcontext, uint64_t va)
+{
+	mcontext->rip = *(uint64_t *)(mcontext->rsp + (6*8));
+}
+
 void arch_ifault_install_return()
 {
-	arch_abort();
+	mem_install_page_fault_handler(return_handler);
 }
 
 void arch_ifault_install_break()

@@ -106,6 +106,10 @@ typedef enum
 	O_R_M16,
 	
 	O_IMM16_32,
+	
+	O_MOFFS_16_32_64,
+			
+	O_RAX,
 } X86OperandTypes;
 
 typedef struct
@@ -431,25 +435,45 @@ static int decode_mov(X86InstructionPrefixes pfx, const uint8_t **code, struct i
 	struct operand *src = &inst->operands[0];
 	struct operand *dst = &inst->operands[1];
 	
-	X86ModRM modrm = read_modrm(code);
-
 	switch (source) {
 	case O_R16_32_64:
 	case O_R8:
+	{
+		X86ModRM modrm = read_modrm(code);
 		if (!decode_reg_operand(src, pfx, modrm.reg, source)) return 0;
 		if (!decode_rm_operand(code, dst, pfx, modrm.mod, modrm.rm, dest)) return 0;
 		return 1;
-
+	}
+	
 	case O_R_M8:
 	case O_R_M16:
 	case O_R_M16_32_64:
+	{
+		X86ModRM modrm = read_modrm(code);
 		if (!decode_reg_operand(dst, pfx, modrm.reg, dest)) return 0;
 		if (!decode_rm_operand(code, src, pfx, modrm.mod, modrm.rm, source)) return 0;
 		return 1;
-
+	}
+	
 	case O_IMM16_32:
 		return 0;
 		
+	case O_MOFFS_16_32_64:
+		src->type = OPERAND_MEM_OFF;
+		src->mem_off = *(const uint64_t *)(*code);
+		(*code) += 8;
+		
+		if (dest == O_RAX) {
+			dst->type = OPERAND_REGISTER;
+			if (pfx & OPERAND_SIZE_OVERRIDE)
+				dst->reg = REG_RAX;
+			else
+				dst->reg = REG_EAX;
+		} else {
+			return 0;
+		}
+		
+		return 1;
 	default:
 		return 0;
 	}
@@ -472,6 +496,7 @@ int decode_instruction(const uint8_t *code, struct instruction *inst)
 	opcode |= *code++;
 
 	switch (opcode) {
+	case 0xa1: if (!decode_mov(p, &code, inst, O_MOFFS_16_32_64, O_RAX)) return 0; else break;
 	case 0x88: if (!decode_mov(p, &code, inst, O_R8, O_R_M8)) return 0; else break;
 	case 0x89: if (!decode_mov(p, &code, inst, O_R16_32_64, O_R_M16_32_64)) return 0; else break;
 	case 0x8a: if (!decode_mov(p, &code, inst, O_R_M8, O_R8)) return 0; else break;

@@ -1,5 +1,6 @@
 
 .macro push_regs
+	push %rsp
 	pushf
 	push %rax
 	push %rbx
@@ -35,6 +36,7 @@
 	pop %rbx
 	pop %rax
 	popf
+	add $8, %rsp
 .endm
 
 .macro enter_intr,has_arg
