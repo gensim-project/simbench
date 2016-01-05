@@ -10,18 +10,18 @@ static void ALIGN kernel()
 	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
 
 	const phys_mem_info_t *phys_mem = mem_get_phys_info();
-	volatile uint32_t *mem_region_start = (uint32_t*)phys_mem->phys_mem_start;
-	volatile uint32_t *mem_region_end =   (uint32_t*)phys_mem->phys_mem_end;
+	uintptr_t mem_region_start = phys_mem->phys_mem_start;
+	uintptr_t mem_region_end =   phys_mem->phys_mem_end;
 	
 	uint32_t page_size = 4096;
 	
 	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
 	
 	int it;
-	volatile uint8_t *ptr = (uint8_t*)mem_region_start;
+	uintptr_t ptr = mem_region_start;
 	for(it = 0; it < total_iterations; ++it) {
 		debug_spinner();
-		*ptr;
+		(*(volatile uint8_t *)(ptr));
 		ptr += page_size;
 		if(ptr >= mem_region_end) ptr = mem_region_start;
 	}
