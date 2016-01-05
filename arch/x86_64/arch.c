@@ -1,4 +1,6 @@
 #include "arch.h"
+#include "platform.h"
+#include "harness.h"
 #include "printf.h"
 
 void arch_init()
@@ -30,5 +32,10 @@ void arch_start(unsigned int magic, void *mb_info)
 {
 	printf_register_putch(qemu_debug_putch);
 	printf("Hello, from C! magic=%08x, mb_info=%p\n", magic, mb_info);
+	
 	arch_init();
+	platform_init();
+	harness_init();
+	harness_main();
+	platform_shutdown();
 }

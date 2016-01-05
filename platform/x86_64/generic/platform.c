@@ -1,5 +1,15 @@
 #include "platform.h"
 
+void platform_init()
+{
+	
+}
+
+void platform_shutdown()
+{
+	
+}
+
 uint32_t* platform_get_null_devptr()
 {
 	// Return SP810 LED register

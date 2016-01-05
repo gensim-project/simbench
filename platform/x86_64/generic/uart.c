@@ -3,12 +3,11 @@
 
 void uart_init()
 {
-	arch_abort();
 }
 
 void uart_putc(char c)
 {
-	arch_abort();
+	asm volatile("out %0, $0xe9" :: "a"(c));
 }
 
 void uart_puts(const char *s)
