@@ -13,6 +13,10 @@ extern void mem_mmu_disable();
 extern void mem_tlb_flush();
 extern void mem_tlb_evict(uintptr_t ptr);
 
+/* Cache flushing operations */
+
+extern void mem_cache_flush();
+
 /* Page table manipulation operations */
 
 extern size_t mem_get_page_size();

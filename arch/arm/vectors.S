@@ -59,7 +59,7 @@ fiq_trampoline:
 
 .globl undef_handler
 undef_handler:
-.word default_handler
+.word default_undef_handler
 
 .globl swi_handler
 swi_handler:
@@ -86,6 +86,24 @@ default_handler:
 	mov r0, #5
 	swi 0x123456
 	b default_handler
+
+.globl default_undef_handler
+.extern uart_puts
+.extern uart_puthex
+default_undef_handler:
+	mov r5, lr
+	ldr r0, =2f
+	bl uart_puts
+	sub r0, r5, #4
+	bl uart_puthex
+	ldr r0, =3f
+	bl uart_puts
+1:
+	b 1b
+2:
+.asciz "Undefined instruction at address "
+3:
+.asciz "\r\n"
 
 .global vectors_end
 vectors_end:

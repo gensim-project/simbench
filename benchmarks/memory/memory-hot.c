@@ -34,8 +34,6 @@ static void ALIGN kernel()
 static void kernel_mmu_init()
 {
 	mem_init();
-	mem_create_page_mapping((uintptr_t)&value, (uintptr_t)&value);
-	
 	mem_mmu_enable();
 	mem_tlb_flush();
 }

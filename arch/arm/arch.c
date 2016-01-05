@@ -31,3 +31,8 @@ uint32_t arch_nonpriviliged_write(uint32_t *ptr)
 	asm("ldrt %0, [%1]" : "=&r"(data) : "r"(ptr));
 	return data;
 }
+
+void arch_undefined_instruction()
+{
+	asm(".word 0xe7ffffff\n");
+}

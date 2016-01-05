@@ -6,7 +6,7 @@
 
 #define EXCEPTION_BENCHMARK_ITERATIONS 50000
 
-static void (*ptr)() = (void (*))0x40000000;
+static void (*ptr)() = (void (*))0xc0000000;
 
 __align12;
 

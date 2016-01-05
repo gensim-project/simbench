@@ -1,6 +1,7 @@
 #include "arch.h"
 
 extern uint32_t vectors_start;
+extern uint32_t _VECTORS_RELOCATE;
 extern uint32_t pabt_handler;
 extern uint32_t dabt_handler;
 extern void pabt_return();
@@ -10,12 +11,12 @@ extern void default_handler();
 // The vectors have been copied into the low page so need to do some address calculation
 static void install_pabt(uint32_t pabt_location)
 {
-	uint32_t vector_location = (uint32_t)&pabt_handler - (uint32_t)&vectors_start;
+	uint32_t vector_location = ((uint32_t)&pabt_handler - (uint32_t)&vectors_start) + (uint32_t)&_VECTORS_RELOCATE;
 	*(uint32_t*)vector_location = pabt_location;
 }
 static void install_dabt(uint32_t dabt_location)
 {
-	uint32_t vector_location = (uint32_t)&dabt_handler - (uint32_t)&vectors_start;
+	uint32_t vector_location = ((uint32_t)&dabt_handler - (uint32_t)&vectors_start) + (uint32_t)&_VECTORS_RELOCATE;
 	*(uint32_t*)vector_location = dabt_location;
 }
 

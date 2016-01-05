@@ -1,20 +1,21 @@
 SECTIONS 
 {
-	. = 0x0;
-	.vectors : 
-	{
-		*vectors.o;
-	}
+	/*
+	This needs to have a section offset of 0xf0000, since the high vector location is 0xffff0000.
+	Also putting this in the linker script is kind of weird.
+	*/
 
-	. = 0x50000000;
+	_VECTORS_RELOCATE = 0x6F0F0000;
+
+	. = 0x60000000;
 	_TEXT_START = .;
 	.text : 
 	{ 
 		*sys.o(.startup);
-		KEEP(*sys.o(.vectors));
 		KEEP(*(.startup));
-		KEEP(*(.vectors))
 		*(.text) 		
+		
+	*(.vectors)
 	}
 
 	.ctors :
@@ -22,6 +23,7 @@ SECTIONS
 		KEEP (*(SORT(.ctors.*)))
 		KEEP (*(.ctors))
 	}
+	
 	_TEXT_END = .;
 
 	_DATA_START = .;

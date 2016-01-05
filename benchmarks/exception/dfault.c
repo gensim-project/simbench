@@ -6,7 +6,7 @@
 
 #define EXCEPTION_BENCHMARK_ITERATIONS 2500
 
-static volatile uint32_t *ptr = (uint32_t*)0x40000000;
+static volatile uint32_t *ptr = (uint32_t*)0xc0000000;
 
 __align12;
 
