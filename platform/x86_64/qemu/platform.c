@@ -10,10 +10,6 @@ void platform_init()
 
 	console_init();	
 	printf_register_stdout(console_putc);
-	
-	int i;
-	for (i = 0; i < 100; i++)
-		printf("xx %d\n", i);
 }
 
 void platform_shutdown()

@@ -22,6 +22,7 @@ static void write_reg(char reg, char val)
 
 void console_init()
 {
+	// Disable the cursor
 	write_reg(0x0a, 0x20);
 	
 	console_clear();
