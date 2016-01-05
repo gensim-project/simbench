@@ -1,11 +1,11 @@
-DIR := $(patsubst %/,%,$(DIR))
+RDIR := $(patsubst %/,%,$(DIR))
 
 EXTRA_TARGETS :=
 
--include $(DIR)/Makefile
+-include $(RDIR)/Makefile
 
-REAL_BUILTIN := $(DIR)/built-in.o
-REAL_OBJ := $(patsubst %,$(DIR)/%,$(OBJ))
+REAL_BUILTIN := $(RDIR)/built-in.o
+REAL_OBJ := $(patsubst %,$(RDIR)/%,$(OBJ))
 
 __build: $(REAL_BUILTIN) $(EXTRA_TARGETS) .FORCE
 	@echo -n
