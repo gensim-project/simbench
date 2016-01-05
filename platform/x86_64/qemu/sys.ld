@@ -32,6 +32,11 @@ SECTIONS
 		*(.bss) 
 	}
 	_DATA_END = .;
+
+	. = ALIGN(4k);
+
+	_HEAP_START = .;
+	_HEAP_SIZE = 0x40000;
 }
 
 ENTRY(multiboot_start)

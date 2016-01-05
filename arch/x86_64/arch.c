@@ -6,6 +6,7 @@
 
 void arch_init()
 {
+	heap_init();
 	irq_init();
 }
 
@@ -25,12 +26,14 @@ uint32_t arch_nonpriviliged_write(uint32_t *ptr)
 	arch_abort();
 }
 
+extern char _HEAP_START;
+
 void arch_start(unsigned int magic, void *mb_info)
 {
 	arch_init();
 	platform_init();
 
-	printf("x86-64: arch_start(magic=%08x, mb_info=%p)\n", magic, mb_info);
+	printf("x86-64: arch_start(magic=%08x, mb_info=%p), heap-start=%p\n", magic, mb_info, &_HEAP_START);
 
 	harness_init();
 	harness_main();

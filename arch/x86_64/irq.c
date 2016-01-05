@@ -2,6 +2,7 @@
 #include "x86.h"
 #include "arch.h"
 #include "printf.h"
+#include "heap.h"
 
 struct IDT {
 	uint16_t off_low;
@@ -40,7 +41,7 @@ void irq_init()
 	} __attribute__((packed)) IDTR;
 
 	IDTR.limit = sizeof(struct IDT) * 0x100;
-	IDTR.base = 0xe000;
+	IDTR.base = (uint64_t)heap_alloc_page();
 
 	struct IDT *idt = (struct IDT *)IDTR.base;
 

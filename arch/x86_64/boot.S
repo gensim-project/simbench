@@ -4,9 +4,6 @@
 #define MULTIBOOT_HEADER_FLAGS 0x00000003
 
 #define INIT_PGT	0x0c000
-#define HEAP		0x10000
-#define HEAP_SIZE	0x80000
-#define STACK		(HEAP + HEAP_SIZE)
 
 .section ".bootstrap", "ax"
 
@@ -25,11 +22,14 @@ __multiboot_header:
 	.long MULTIBOOT_HEADER_FLAGS
 	.long -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 
+.extern _HEAP_START
+.extern _HEAP_SIZE
+
 .align 16
 start32:
-	// Initialise the stack
-	movl $(STACK), %esp
-	movl %esp, %ebp
+	lea _HEAP_START, %ebp
+	add _HEAP_SIZE, %ebp
+	movl %ebp, %esp
 
 	// Reset EFLAGS
 	pushl $0
