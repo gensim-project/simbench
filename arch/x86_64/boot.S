@@ -33,10 +33,10 @@ start32:
 	popf
 
 	// Store EBX and EAX.  Need the zeroes, because when we pop, they'll be popped as 64-bit
+	pushl $0
 	pushl %ebx
 	pushl $0
 	pushl %eax
-	pushl $0
 
 	// Print out a debugging message
 	lea msg1, %esi

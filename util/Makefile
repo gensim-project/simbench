@@ -1,1 +1,1 @@
-OBJ := memcpy.o memset.o debug.o
+OBJ := memcpy.o memset.o debug.o printf.o

@@ -1,4 +1,5 @@
 #include "arch.h"
+#include "printf.h"
 
 void arch_init()
 {
@@ -20,10 +21,14 @@ uint32_t arch_nonpriviliged_write(uint32_t *ptr)
 	arch_abort();
 }
 
-extern void printstr64(const char *msg);
+static void qemu_debug_putch(int ch)
+{
+	asm volatile("out %0, $0xe9" :: "a"(ch));
+}
 
 void arch_start(unsigned long a, unsigned long b)
 {
-	printstr64("Hello from C!\n");
+	printf_register_putch(qemu_debug_putch);
+	printf("Hello, from C! a=%lx, b=%lx\n", a, b);
 	arch_init();
 }
