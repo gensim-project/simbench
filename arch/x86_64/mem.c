@@ -1,6 +1,7 @@
 #include "arch.h"
 #include "mem.h"
 #include "x86.h"
+#include "printf.h"
 
 page_fault_handler_fn_t page_fault_handler_fn;
 

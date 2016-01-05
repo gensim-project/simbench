@@ -1,15 +1,18 @@
 -include $(DIR)/Makefile
 
-REAL_OBJ := $(patsubst %,$(DIR)/%,$(OBJ))
-REAL_DEP := $(REAL_OBJ:.o=.d)
+REAL_CLEAN_OBJ := $(patsubst %,__clean_$(DIR)/%,$(OBJ))
+REAL_CLEAN_DEP := $(patsubst %.o,__clean_$(DIR)/%.d,$(OBJ))
 REAL_BUILTIN := $(DIR)/built-in.o
 
-__clean: .FORCE
-	@echo "  RM      $(REAL_BUILTIN)"
+__clean: $(REAL_CLEAN_OBJ) $(REAL_CLEAN_DEP) .FORCE
+	@echo "  RM      $(patsubst $(BASEDIR)/%,%,$(REAL_BUILTIN))"
 	$(Q)rm -f $(REAL_BUILTIN)
-	@echo "  RM      $(REAL_OBJ)"
-	$(Q)rm -f $(REAL_OBJ)
-	@echo "  RM      $(REAL_DEP)"
-	$(Q)rm -f $(REAL_DEP)
+
+$(REAL_CLEAN_OBJ): .FORCE
+	@echo "  RM      $(patsubst $(BASEDIR)/%,%,$(patsubst __clean_%,%,$@))"
+	$(Q)rm -f $(patsubst __clean_%,%,$@)
+
+$(REAL_CLEAN_DEP): .FORCE
+	$(Q)rm -f $(patsubst __clean_%,%,$@)
 
 .PHONY: .FORCE

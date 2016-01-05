@@ -9,7 +9,7 @@ typedef struct _FILE {
 	putch_fn_t putch_fn;
 } FILE;
 
-extern void printf_register_stdio(putch_fn_t putch_fn);
+extern void printf_register_stdout(putch_fn_t putch_fn);
 extern void printf_register_uart(putch_fn_t putch_fn);
 
 extern int snprintf(char *buffer, int size, const char *fmt, ...);

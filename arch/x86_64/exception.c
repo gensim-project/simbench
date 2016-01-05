@@ -1,6 +1,7 @@
 #include "arch.h"
 #include "x86.h"
 #include "decode.h"
+#include "printf.h"
 
 static void return_handler(struct mcontext *mcontext, uint64_t va)
 {
