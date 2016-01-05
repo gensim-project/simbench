@@ -11,9 +11,9 @@ void arch_ifault_install_break()
 	arch_abort();
 }
 
-static void skip_handler(uint64_t va)
+static void skip_handler(struct mcontext *mcontext, uint64_t va)
 {
-	printf("TODO: skip instruction\n");
+	printf("TODO: skip instruction @ rip=%p\n", mcontext->rip);
 	arch_abort();
 }
 

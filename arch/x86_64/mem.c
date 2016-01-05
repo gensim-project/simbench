@@ -2,8 +2,15 @@
 #include "mem.h"
 #include "x86.h"
 
+page_fault_handler_fn_t page_fault_handler_fn;
+
 static unsigned long initial_pagetables;
 static unsigned long runtime_pagetables;
+
+void mem_install_page_fault_handler(page_fault_handler_fn_t handler_fn)
+{
+	page_fault_handler_fn = handler_fn;
+}
 
 static void prepare_runtime_pagetables()
 {
@@ -14,8 +21,16 @@ static void prepare_runtime_pagetables()
 	*pdp = 0x83;
 }
 
+static void default_page_fault_handler(struct mcontext *mcontext, uint64_t va)
+{
+	printf("unhandled page-fault: code=%lx, rip=%p, va=%p\n", mcontext->extra, mcontext->rip, va);
+	arch_abort();
+}
+
 void mem_init()
 {
+	mem_install_page_fault_handler(default_page_fault_handler);
+	
 	initial_pagetables = 0xc000;
 	runtime_pagetables = 0x400000;
 
@@ -63,24 +78,4 @@ int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	arch_abort();
-}
-
-static page_fault_handler_fn_t page_fault_handler_fn;
-
-void mem_install_page_fault_handler(page_fault_handler_fn_t handler_fn)
-{
-	page_fault_handler_fn = handler_fn;
-}
-
-void handle_trap_page_fault(struct mcontext *mcontext, uint64_t code)
-{
-	uint64_t va;
-	asm volatile("mov %%cr2, %0\n" : "=r"(va));
-	
-	if (page_fault_handler_fn) {
-		page_fault_handler_fn(va);
-	} else {
-		printf("unhandled page-fault: code=%lx, va=%lx\n", code, va);
-		arch_abort();
-	}
 }

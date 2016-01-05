@@ -63,4 +63,14 @@ trap_\name:
 
 trap_macro unknown,0
 trap_macro unknown_arg,1
-trap_macro page_fault,1
+
+.extern page_fault_handler_fn
+.globl trap_page_fault
+trap_page_fault:
+	enter_intr 1
+
+	mov %cr2, %rsi
+	lea page_fault_handler_fn, %rcx
+	call *(%rcx)
+
+	exit_intr
