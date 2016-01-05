@@ -3,7 +3,7 @@
 
 #include <stdarg.h>
 
-typedef void (*putch_fn_t)(int ch);
+typedef void (*putch_fn_t)(char ch);
 
 extern void printf_register_putch(putch_fn_t putch_fn);
 

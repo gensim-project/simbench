@@ -1,8 +1,11 @@
 #include "platform.h"
+#include "uart.h"
+#include "printf.h"
 
 void platform_init()
 {
-	
+	uart_init();
+	printf_register_putch(uart_putc);
 }
 
 void platform_shutdown()

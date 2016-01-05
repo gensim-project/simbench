@@ -7,7 +7,7 @@ void uart_init()
 
 void uart_putc(char c)
 {
-	asm volatile("out %0, $0xe9" :: "a"(c));
+	asm volatile("outb %0, $0xe9" :: "a"(c));
 }
 
 void uart_puts(const char *s)
