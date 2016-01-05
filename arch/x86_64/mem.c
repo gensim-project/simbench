@@ -1,9 +1,24 @@
 #include "arch.h"
 #include "mem.h"
 
+static unsigned long initial_pagetables;
+static unsigned long runtime_pagetables;
+
+static void prepare_runtime_pagetables()
+{
+	uint64_t *pml4 = (uint64_t *)runtime_pagetables;
+	*pml4 = runtime_pagetables + 0x1003;
+	
+	uint64_t *pdp = (uint64_t *)(runtime_pagetables + 0x1000);
+	*pdp = 0x83;
+}
+
 void mem_init()
 {
-	arch_abort();
+	initial_pagetables = 0xc000;
+	runtime_pagetables = 0x400000;
+
+	prepare_runtime_pagetables();
 }
 
 void mem_reset()
@@ -13,22 +28,24 @@ void mem_reset()
 
 void mem_mmu_enable()
 {
-	arch_abort();
+	asm volatile("mov %0, %%cr3\n" :: "r"(runtime_pagetables));
 }
 
 void mem_mmu_disable()
 {
-	arch_abort();
+	asm volatile("mov %0, %%cr3\n" :: "r"(initial_pagetables));
 }
 
 void mem_tlb_flush()
 {
-	arch_abort();
+	asm volatile(
+		"mov %cr3, %rax\n"
+		"mov %rax, %cr3\n");
 }
 
 void mem_tlb_evict(uintptr_t ptr)
 {
-	arch_abort();
+	asm volatile("invlpg (%0)\n" :: "r"(ptr));
 }
 
 size_t mem_get_page_size()

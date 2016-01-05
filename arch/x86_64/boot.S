@@ -3,9 +3,9 @@
 #define MULTIBOOT_HEADER_MAGIC 0x1BADB002
 #define MULTIBOOT_HEADER_FLAGS 0x00000003
 
-#define INIT_PGT	0x10000
-#define HEAP		0x20000
-#define HEAP_SIZE	0x40000
+#define INIT_PGT	0x0c000
+#define HEAP		0x10000
+#define HEAP_SIZE	0x80000
 #define STACK		(HEAP + HEAP_SIZE)
 
 .section ".bootstrap", "ax"

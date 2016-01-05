@@ -10,6 +10,7 @@ void arch_init()
 
 void arch_abort()
 {
+	printf("x86-64: abort!\n");
 	for (;;) asm volatile("hlt\n");
 }
 
