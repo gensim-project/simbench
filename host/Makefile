@@ -1,6 +1,7 @@
-
 host : main.c
-	gcc $^ -o $@ -O3 -lrt
+	@echo "  CCLD    $@"
+	$(Q)gcc $^ -o $@ -O3 -lrt
 
 clean:
-	rm -f host
+	@echo "  RM      host"
+	$(Q)rm -f host
