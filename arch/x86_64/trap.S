@@ -1,0 +1,66 @@
+
+.macro push_regs
+	pushf
+	push %rax
+	push %rbx
+	push %rcx
+	push %rdx
+	push %rdi
+	push %rsi
+	push %rbp
+	push %r8
+	push %r9
+	push %r10
+	push %r11
+	push %r12
+	push %r13
+	push %r14
+	push %r15
+.endm
+
+.macro pop_regs
+	pop %r15
+	pop %r14
+	pop %r13
+	pop %r12
+	pop %r11
+	pop %r10
+	pop %r9
+	pop %r8
+	pop %rbp
+	pop %rsi
+	pop %rdi
+	pop %rdx
+	pop %rcx
+	pop %rbx
+	pop %rax
+	popf
+.endm
+
+.macro enter_intr,has_arg
+.if ! \has_arg
+	push $0
+.endif
+	push_regs
+
+	mov %rsp, %rdi
+.endm
+
+.macro exit_intr
+	pop_regs
+	add $8, %rsp
+	iretq
+.endm
+
+.macro trap_macro name,has_arg
+.extern handle_trap_\name
+.globl trap_\name
+trap_\name:
+	enter_intr \has_arg
+	call handle_trap_\name
+	exit_intr
+.endm
+
+trap_macro unknown,0
+trap_macro unknown_arg,1
+trap_macro page_fault,1

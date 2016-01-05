@@ -2,10 +2,11 @@
 #include "platform.h"
 #include "harness.h"
 #include "printf.h"
+#include "irq.h"
 
 void arch_init()
 {
-	
+	irq_init();
 }
 
 void arch_abort()

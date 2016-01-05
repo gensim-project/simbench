@@ -1,5 +1,6 @@
 #include "arch.h"
 #include "mem.h"
+#include "x86.h"
 
 static unsigned long initial_pagetables;
 static unsigned long runtime_pagetables;
@@ -55,10 +56,31 @@ size_t mem_get_page_size()
 
 int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 {
+	printf("create page mapping pa:%lx = va:%lx\n", phys_addr, virt_addr);
 	arch_abort();
 }
 
 int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	arch_abort();
+}
+
+static page_fault_handler_fn_t page_fault_handler_fn;
+
+void mem_install_page_fault_handler(page_fault_handler_fn_t handler_fn)
+{
+	page_fault_handler_fn = handler_fn;
+}
+
+void handle_trap_page_fault(struct mcontext *mcontext, uint64_t code)
+{
+	uint64_t va;
+	asm volatile("mov %%cr2, %0\n" : "=r"(va));
+	
+	if (page_fault_handler_fn) {
+		page_fault_handler_fn(va);
+	} else {
+		printf("unhandled page-fault: code=%lx, va=%lx\n", code, va);
+		arch_abort();
+	}
 }
