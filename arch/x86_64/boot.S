@@ -15,8 +15,8 @@ multiboot_start:
 
 	// Disable IRQs
 	mov $0xff, %al
-    out %al, $0xa1
-    out %al, $0x21
+	out %al, $0xa1
+	out %al, $0x21
 
 	nop
 	nop
@@ -45,25 +45,25 @@ start32:
 	// Load a NULL IDT
 	lidt idt_ptr
 
-    mov $0x6b0, %eax
-    mov %eax, %cr4
+	mov $0x6b0, %eax
+	mov %eax, %cr4
  
-	// TODO
-    call build_pagetables
-    mov %edi, %cr3
+	// Build the initial page tables
+	call build_pagetables
+	mov %edi, %cr3
  
 	// Read the EFER
-    mov $0xc0000080, %ecx 
-    rdmsr
+	mov $0xc0000080, %ecx 
+	rdmsr
 	
 	// Write the EFER with the LME bit set
-    or $0x901, %eax
-    wrmsr
+	or $0x901, %eax
+	wrmsr
  
 	// Enable paging and protection
-    mov %cr0, %eax
-    or $0x80010007, %eax
-    mov %eax, %cr0                    
+	mov %cr0, %eax
+	or $0x80010007, %eax
+	mov %eax, %cr0                    
 
 	// Load the 64-bit GDT
 	lgdt %cs:gdt_ptr
