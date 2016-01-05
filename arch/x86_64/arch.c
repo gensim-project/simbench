@@ -26,9 +26,9 @@ static void qemu_debug_putch(int ch)
 	asm volatile("out %0, $0xe9" :: "a"(ch));
 }
 
-void arch_start(unsigned long a, unsigned long b)
+void arch_start(unsigned int magic, void *mb_info)
 {
 	printf_register_putch(qemu_debug_putch);
-	printf("Hello, from C! a=%lx, b=%lx\n", a, b);
+	printf("Hello, from C! magic=%08x, mb_info=%p\n", magic, mb_info);
 	arch_init();
 }

@@ -2,9 +2,11 @@
 
 #define MULTIBOOT_HEADER_MAGIC 0x1BADB002
 #define MULTIBOOT_HEADER_FLAGS 0x00000003
-#define TEMP_STACK_SIZE 0x1000
 
-#define TEMP_PGT 0x10000
+#define INIT_PGT	0x10000
+#define HEAP		0x20000
+#define HEAP_SIZE	0x40000
+#define STACK		(HEAP + HEAP_SIZE)
 
 .section ".bootstrap", "ax"
 
@@ -13,20 +15,21 @@ multiboot_start:
 	// Disable interrupts
 	cli
 
-	// Disable IRQs
-	mov $0xff, %al
-	out %al, $0xa1
-	out %al, $0x21
-
-	nop
-	nop
-
-	// Begin
+	// Begin 32-bit execution
 	jmp start32
+
+// Multiboot header - should be as close to the top as practicable
+.align 4
+__multiboot_header:
+	.long MULTIBOOT_HEADER_MAGIC
+	.long MULTIBOOT_HEADER_FLAGS
+	.long -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 
 .align 16
 start32:
-	movl $(__temp_stack + TEMP_STACK_SIZE), %esp
+	// Initialise the stack
+	movl $(STACK), %esp
+	movl %esp, %ebp
 
 	// Reset EFLAGS
 	pushl $0
@@ -38,29 +41,41 @@ start32:
 	pushl $0
 	pushl %eax
 
+	// Disable IRQs
+	mov $0xff, %al
+	out %al, $0xa1
+	out %al, $0x21
+
+	// Let the PIC settle down
+	nop
+	nop
+
 	// Print out a debugging message
-	lea msg1, %esi
+	lea msg1, %edi
 	call printstr32
 
 	// Load a NULL IDT
 	lidt idt_ptr
 
-	mov $0x6b0, %eax
-	mov %eax, %cr4
- 
 	// Build the initial page tables
-	call build_pagetables
+	mov $(INIT_PGT), %edi
 	mov %edi, %cr3
- 
+
+	call build_pagetables
+
+	// Initialise CR4 with: PSE, PAE, PGE, OSFXSR, OSXMMEXCPT
+	mov $0x6b0, %eax
+	mov %eax, %cr4 
+
 	// Read the EFER
 	mov $0xc0000080, %ecx 
 	rdmsr
 	
-	// Write the EFER with the LME bit set
+	// Initialise EFER with: SCE, LME, NXE
 	or $0x901, %eax
 	wrmsr
  
-	// Enable paging and protection
+	// Initialise CR0 with: PE, MP, EM, WP, PG
 	mov %cr0, %eax
 	or $0x80010007, %eax
 	mov %eax, %cr0                    
@@ -72,35 +87,24 @@ start32:
 	jmp $0x08, $start64
 
 build_pagetables:
-	mov $0x10000, %edi
-
-	// PML4
+	// PML4 - Single entry
 	lea 0x1000(%edi), %eax
 	or $3, %eax
 	mov %eax, (%edi)
 
-	// PDPT
-	lea 0x2000(%edi), %eax
-	or $3, %eax
+	// PDPT - Map a 1GiB page
+	mov $0x83, %eax
 	mov %eax, 0x1000(%edi)
-
-	// PDP
-	xor %eax, %eax
-	or $0x83, %eax
-	mov %eax, 0x2000(%edi)
-
-	or 0x200000, %eax
-	mov %eax, 0x2008(%edi)
 
 	ret
 
 printstr32:
-	movb (%esi), %al
+	movb (%edi), %al
 	cmpb $0, %al
 	jz 1f
 
 	outb %al, $0xe9
-	inc %esi
+	inc %edi
 	jmp printstr32
 
 1:
@@ -110,9 +114,11 @@ printstr32:
 
 .code64
 start64:
+	// Print out a friendly message
 	lea msg2, %rdi
 	call printstr64
 
+	// Load the segment registers with the data segment selector
 	mov $0x10, %ax
 	mov %ax, %ds
 	mov %ax, %es
@@ -120,15 +126,23 @@ start64:
 	mov %ax, %gs
 	mov %ax, %ss
 
-	pop %rsi
+	// Grab the saved multiboot arguments
 	pop %rdi
+	pop %rsi
+
+	// Push a canary on to the stack
+	mov $0xdeadbeefbabecafe, %rax
+	push %rax
+
+	// Begin!
 	call arch_start
 
+	// If we get here, loop forever.
 1:
 	hlt
+	pause
 	jmp 1b
 
-.globl printstr64
 printstr64:
 	movb (%rdi), %al
 	cmpb $0, %al
@@ -140,12 +154,6 @@ printstr64:
 
 1:
 	ret
-
-.align 4
-__multiboot_header:
-	.long MULTIBOOT_HEADER_MAGIC
-	.long MULTIBOOT_HEADER_FLAGS
-	.long -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
 
 .data
 
@@ -172,7 +180,4 @@ __gdt:
 	// Kernel DS
 	.quad 0x0000920000000000
 __gdt_end:
-
-.align 4096
-.comm __temp_stack, TEMP_STACK_SIZE
 
