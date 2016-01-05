@@ -5,12 +5,18 @@
 
 typedef void (*putch_fn_t)(char ch);
 
+typedef struct _FILE {
+	putch_fn_t putch_fn;
+} FILE;
+
 extern void printf_register_putch(putch_fn_t putch_fn);
 
 extern int snprintf(char *buffer, int size, const char *fmt, ...);
 extern int sprintf(char *buffer, const char *fmt, ...);
 extern int vsnprintf(char *buffer_base, int size, const char *fmt_base, va_list args);
 extern int printf(const char *fmt, ...);
+extern int fprintf(FILE *f, const char *fmt, ...);
+
+extern FILE *STDOUT, *UART;
 
 #endif /* PRINTF_H */
-

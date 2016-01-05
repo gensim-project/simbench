@@ -26,7 +26,8 @@ int sprintf(char *buffer, const char *fmt, ...)
 
 static void prepend_to_buffer(char c, char *buffer, int size)
 {
-	for (int i = size; i > 0; i--) {
+	int i;
+	for (i = size; i > 0; i--) {
 		buffer[i] = buffer[i - 1];
 	}
 
@@ -48,7 +49,15 @@ static int append_num(char *buffer, int size, unsigned long long int value, int 
 
 	if (value > 0) {
 		while (value > 0 && n < size) {
+#ifdef __ARM
+			// TODO: FIXME: HACK HACK HACK - need to work out how to get division and modulus working
+			if (base != 16) return 0;
+			int new_value = value >> 4;
+			int digit_value = value & 0xf;
+#else
+			int new_value = value / base;
 			int digit_value = value % base;
+#endif
 
 			switch(digit_value) {
 			case 0 ... 9:
@@ -60,7 +69,7 @@ static int append_num(char *buffer, int size, unsigned long long int value, int 
 				break;
 			}
 
-			value /= base;
+			value = new_value;
 		}
 	} else if (n < size) {
 		prepend_to_buffer('0', buffer, n++);
@@ -221,31 +230,65 @@ retry_format:
 	return count;
 }
 
-static putch_fn_t printf_putch_fn;
+static FILE stdout_file;
+static FILE uart_file;
 
-void printf_register_putch(putch_fn_t putch_fn)
+FILE *STDOUT = &stdout_file;
+FILE *UART = &uart_file;
+
+void printf_register_stdout(putch_fn_t putch_fn)
 {
-	printf_putch_fn = putch_fn;
+	stdout_file.putch_fn = putch_fn;
 }
 
-int printf(const char *fmt, ...)
+void printf_register_uart(putch_fn_t putch_fn)
+{
+	uart_file.putch_fn = putch_fn;
+}
+
+int fprintf(FILE *f, const char *fmt, ...)
 {
 	char buffer[0x1000];
-	int rc;
+	int rc, i;
 	va_list args;
 	
-	if (!printf_putch_fn) return 0;
+	if (!f) return 0;
+	if (!f->putch_fn) return 0;
 
 	va_start(args, fmt);
 	rc = vsnprintf(buffer, 0x1000, fmt, args);
 	va_end(args);
 
-	for (int i = 0; i < 0x1000; i++) {
+	for (i = 0; i < 0x1000; i++) {
 		if (buffer[i] == 0) {
 			break;
 		}
 
-		printf_putch_fn(buffer[i]);
+		f->putch_fn(buffer[i]);
+	}
+
+	return rc;
+}
+
+int printf(const char *fmt, ...)
+{
+	char buffer[0x1000];
+	int rc, i;
+	va_list args;
+	
+	if (!STDOUT) return 0;
+	if (!STDOUT->putch_fn) return 0;
+
+	va_start(args, fmt);
+	rc = vsnprintf(buffer, 0x1000, fmt, args);
+	va_end(args);
+
+	for (i = 0; i < 0x1000; i++) {
+		if (buffer[i] == 0) {
+			break;
+		}
+
+		STDOUT->putch_fn(buffer[i]);
 	}
 
 	return rc;

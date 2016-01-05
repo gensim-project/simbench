@@ -11,3 +11,10 @@ void * __weak memcpy(void *dest, const void *src, size_t n)
 	
 	return dest;
 }
+
+void * __weak memmove(void *dest, const void *src, size_t n)
+{
+	uint8_t temp[n];
+	memcpy(temp, src, n);
+	memcpy(dest, temp, n);
+}
