@@ -1,26 +1,19 @@
 #include "platform.h"
 #include "uart.h"
 #include "printf.h"
-
-#define ROWS	25
-#define COLUMNS	80
-
-static void clear_screen()
-{
-	uint16_t *vga = (uint16_t *)0xb8000;
-	
-	for (int i = 0; i < ROWS * COLUMNS; i++) {
-		vga[i] = 0;
-	}
-}
+#include "console.h"
 
 void platform_init()
 {
 	uart_init();
-	printf_register_stdout(uart_putc);
 	printf_register_uart(uart_putc);
+
+	console_init();	
+	printf_register_stdout(console_putc);
 	
-	clear_screen();
+	int i;
+	for (i = 0; i < 100; i++)
+		printf("xx %d\n", i);
 }
 
 void platform_shutdown()
