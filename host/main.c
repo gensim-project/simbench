@@ -73,7 +73,7 @@ int read_benchmark()
 	uint64_t ticks_taken = end_ticks - start_ticks;
 	double seconds_taken = ticks_taken / 1000000000.0;
 	
-	printf(" %lf\n", seconds_taken);
+	printf(" %lf\r\n", seconds_taken);
 	
 	return 0;
 }
