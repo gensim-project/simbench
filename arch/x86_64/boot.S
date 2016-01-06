@@ -50,9 +50,11 @@ start32:
 	nop
 	nop
 
+#ifdef DEBUG_BOOT
 	// Print out a debugging message
 	lea msg1, %edi
 	call printstr32
+#endif
 
 	// Load a NULL IDT
 	lidt idt_ptr
@@ -98,6 +100,7 @@ build_pagetables:
 
 	ret
 
+#ifdef DEBUG_BOOT
 printstr32:
 	movb (%edi), %al
 	cmpb $0, %al
@@ -109,14 +112,17 @@ printstr32:
 
 1:
 	ret
+#endif
 
 .align 16
 
 .code64
 start64:
+#ifdef DEBUG_BOOT
 	// Print out a friendly message
 	lea msg2, %rdi
 	call printstr64
+#endif
 
 	// Load the segment registers with the data segment selector
 	mov $0x10, %ax
@@ -143,6 +149,7 @@ start64:
 	pause
 	jmp 1b
 
+#ifdef DEBUG_BOOT
 printstr64:
 	movb (%rdi), %al
 	cmpb $0, %al
@@ -154,6 +161,7 @@ printstr64:
 
 1:
 	ret
+#endif
 
 .data
 

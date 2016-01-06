@@ -159,7 +159,7 @@ static inline table_indicies calculate_indicies(uintptr_t virt_addr)
 int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	table_indicies idx = calculate_indicies(virt_addr);
-		
+	
 	pte *pml = &((pte *)runtime_pagetables)[idx.pml];
 	if (!is_present(pml)) {
 		if (get_base_address(pml) == 0) {

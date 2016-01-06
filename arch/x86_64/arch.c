@@ -3,6 +3,7 @@
 #include "harness.h"
 #include "printf.h"
 #include "irq.h"
+#include "heap.h"
 
 void arch_init()
 {
@@ -23,7 +24,7 @@ void arch_code_flush(size_t address)
 
 uint32_t arch_nonpriviliged_write(uint32_t *ptr)
 {
-	arch_abort();
+	return *ptr;
 }
 
 extern char _HEAP_START;
