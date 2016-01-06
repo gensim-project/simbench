@@ -30,10 +30,13 @@ extern char _HEAP_START;
 
 void arch_start(unsigned int magic, void *mb_info)
 {
+	uint64_t rsp;
+	asm volatile("mov %%rsp, %0\n" : "=r"(rsp));
+
 	arch_init();
 	platform_init();
 
-	printf("x86-64: arch_start(magic=%08x, mb_info=%p), heap-start=%p\n", magic, mb_info, &_HEAP_START);
+	printf("x86-64: arch_start(magic=%08x, mb_info=%p), heap-start=%p, stack=%p\n", magic, mb_info, &_HEAP_START, rsp);
 
 	harness_init();
 	harness_main();

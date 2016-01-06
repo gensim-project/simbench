@@ -36,7 +36,7 @@ SECTIONS
 	. = ALIGN(4k);
 
 	_HEAP_START = .;
-	_HEAP_SIZE = 0x40000;
+	_HEAP_SIZE = 0x400000;
 }
 
 ENTRY(multiboot_start)

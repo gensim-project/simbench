@@ -28,7 +28,7 @@ __multiboot_header:
 .align 16
 start32:
 	lea _HEAP_START, %ebp
-	add _HEAP_SIZE, %ebp
+	lea _HEAP_SIZE(%ebp), %ebp
 	movl %ebp, %esp
 
 	// Reset EFLAGS
