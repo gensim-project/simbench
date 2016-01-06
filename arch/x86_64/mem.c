@@ -67,23 +67,36 @@ void mem_init()
 void mem_reset()
 {
 	mem_install_page_fault_handler(default_page_fault_handler);
+	
+	// TODO: Reset page mappings?
+}
+
+static inline void write_cr3(uintptr_t addr)
+{
+	asm volatile("mov %0, %%cr3\n" :: "r"(addr));
+}
+
+static inline uintptr_t read_cr3()
+{
+	uintptr_t addr;
+	asm volatile("mov %%cr3, %0\n" : "=r"(addr));
+	
+	return addr;
 }
 
 void mem_mmu_enable()
 {
-	asm volatile("mov %0, %%cr3\n" :: "r"(runtime_pagetables));
+	write_cr3(runtime_pagetables);
 }
 
 void mem_mmu_disable()
 {
-	asm volatile("mov %0, %%cr3\n" :: "r"(initial_pagetables));
+	write_cr3(initial_pagetables);
 }
 
 void mem_tlb_flush()
 {
-	asm volatile(
-		"mov %cr3, %rax\n"
-		"mov %rax, %cr3\n");
+	write_cr3(read_cr3());
 }
 
 void mem_tlb_evict(uintptr_t ptr)
@@ -102,6 +115,10 @@ typedef struct {
 
 typedef uint64_t pte;
 
+#define PF_PRESENT		1
+#define PF_WRITABLE		2
+#define PF_USER			4
+
 static inline void set_base_address(pte *pte, uintptr_t base_addr)
 {
 	*pte = (base_addr & ~0xfffULL) | ((*pte) & 0xfffULL);
@@ -117,6 +134,16 @@ static inline void set_flags(pte *pte, uint64_t flags)
 	*pte = (flags & 0xfffULL) | ((*pte) & ~0xfffULL);
 }
 
+static inline uint64_t get_flags(const pte *pte)
+{
+	return (*pte) & 0xfffULL;
+}
+
+static inline int is_present(const pte *pte)
+{
+	return !!(get_flags(pte) & PF_PRESENT);
+}
+
 static inline table_indicies calculate_indicies(uintptr_t virt_addr)
 {
 	table_indicies ret;
@@ -129,35 +156,40 @@ static inline table_indicies calculate_indicies(uintptr_t virt_addr)
 	return ret;
 }
 
-#define PF_PRESENT		1
-#define PF_WRITABLE		2
-#define PF_USER			4
-
 int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	table_indicies idx = calculate_indicies(virt_addr);
 		
-	pte *pml = (pte *)runtime_pagetables;
-	if (pml[idx.pml] == 0) {
-		set_base_address(&pml[idx.pml], (uint64_t)heap_alloc_page());
-		set_flags(&pml[idx.pml], PF_PRESENT | PF_WRITABLE | PF_USER);
+	pte *pml = &((pte *)runtime_pagetables)[idx.pml];
+	if (!is_present(pml)) {
+		if (get_base_address(pml) == 0) {
+			set_base_address(pml, (uintptr_t)heap_alloc_page());
+		}
+		
+		set_flags(pml, PF_PRESENT | PF_WRITABLE | PF_USER);
 	}
 	
-	pte *pdp = (pte *)get_base_address(&pml[idx.pml]);
-	if (pdp[idx.pdp] == 0) {
-		set_base_address(&pdp[idx.pdp], (uint64_t)heap_alloc_page());
-		set_flags(&pdp[idx.pdp], PF_PRESENT | PF_WRITABLE | PF_USER);
+	pte *pdp = &((pte *)get_base_address(pml))[idx.pdp];
+	if (!is_present(pdp)) {
+		if (get_base_address(pdp) == 0) {
+			set_base_address(pdp, (uintptr_t)heap_alloc_page());
+		}
+		
+		set_flags(pdp, PF_PRESENT | PF_WRITABLE | PF_USER);
 	}
 
-	pte *pd = (pte *)get_base_address(&pdp[idx.pdp]);
-	if (pd[idx.pd] == 0) {
-		set_base_address(&pd[idx.pd], (uint64_t)heap_alloc_page());
-		set_flags(&pd[idx.pd], PF_PRESENT | PF_WRITABLE | PF_USER);
+	pte *pd = &((pte *)get_base_address(pdp))[idx.pd];
+	if (!is_present(pd)) {
+		if (get_base_address(pd) == 0) {
+			set_base_address(pd, (uintptr_t)heap_alloc_page());
+		}
+		
+		set_flags(pd, PF_PRESENT | PF_WRITABLE | PF_USER);
 	}
 	
-	pte *pt = (pte *)get_base_address(&pd[idx.pd]);
-	set_base_address(&pt[idx.pt], (uint64_t)phys_addr);
-	set_flags(&pt[idx.pt], PF_PRESENT | PF_WRITABLE | PF_USER);
+	pte *pt = &((pte *)get_base_address(pd))[idx.pt];
+	set_base_address(pt, phys_addr);
+	set_flags(pt, PF_PRESENT | PF_WRITABLE | PF_USER);
 }
 
 int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
