@@ -14,6 +14,8 @@
 static char mem_inited = 0;
 
 static char mem_tlb_unified = 0;
+static char mem_cache_unified = 0;
+static char mem_cache_implemented = 0;
 
 // This needs to be super aligned
 static uint32_t section_table[1 << 12] __attribute__((aligned(16384)));
@@ -77,11 +79,26 @@ static void mem_check_is_tlb_unified()
 	else mem_tlb_unified = 1;
 }
 
+static void mem_check_is_cache_unified()
+{
+	uint32_t ctrl;
+	asm("mrc p15, 0, %0, cr0, cr0, 1" : "=r"(ctrl) ::);
+	
+	uint32_t cache_size = ctrl & 0xfff;
+	if(((cache_size >> 2) & 0xf) == 0x1) mem_cache_implemented = 0;
+	else mem_cache_implemented = 1;
+	
+	ctrl = (ctrl >> 24) & 1;
+	if(ctrl) mem_cache_unified = 0;
+	else mem_cache_unified = 1;
+}
+
 void mem_init()
 {
 	if(mem_inited) return;
 	
 	mem_check_is_tlb_unified();
+	mem_check_is_cache_unified();
 	
 	// Write L1 page table location to TTbr
 	write_ttbr((void*)section_table);
@@ -199,9 +216,14 @@ void mem_tlb_evict(uintptr_t ptr)
 
 void mem_cache_flush()
 {
+	if(!mem_cache_implemented) return;
+	
 	// Clean entire data and unified cache
-	asm("mcr p15, 0, %0, cr7, cr14, 0" :: "r"(0):);
-	asm("mcr p15, 0, %0, cr7, cr15, 0" :: "r"(0):);
+	if(mem_cache_unified) {
+		asm("mcr p15, 0, %0, cr7, cr15, 0" :: "r"(0):);
+	} else {
+		asm("mcr p15, 0, %0, cr7, cr14, 0" :: "r"(0):);
+	}
 	
 	// Drain write buffer (DSB)
 	asm("mcr p15, 0, %0, cr7, cr10, 4" :: "r"(0):);
