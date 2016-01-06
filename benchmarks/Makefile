@@ -12,4 +12,3 @@ OBJ += $(codegen-benchmarks)
 OBJ += $(dispatch-benchmarks)
 OBJ += $(mem-benchmarks)
 OBJ += $(io-benchmarks)
-

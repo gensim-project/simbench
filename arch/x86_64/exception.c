@@ -5,7 +5,8 @@
 
 static void return_handler(struct mcontext *mcontext, uint64_t va)
 {
-	mcontext->rip = *(uint64_t *)(mcontext->rsp + (6*8));
+	mcontext->rip = *(uint64_t *)(mcontext->tempSP);
+	mcontext->tempSP += 8;
 }
 
 void arch_ifault_install_return()

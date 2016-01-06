@@ -3,6 +3,7 @@
 #include "harness.h"
 #include "printf.h"
 #include "irq.h"
+#include "heap.h"
 
 void arch_init()
 {
@@ -23,17 +24,20 @@ void arch_code_flush(size_t address)
 
 uint32_t arch_nonpriviliged_write(uint32_t *ptr)
 {
-	arch_abort();
+	return *ptr;
 }
 
 extern char _HEAP_START;
 
 void arch_start(unsigned int magic, void *mb_info)
 {
+	uint64_t rsp;
+	asm volatile("mov %%rsp, %0\n" : "=r"(rsp));
+
 	arch_init();
 	platform_init();
 
-	printf("x86-64: arch_start(magic=%08x, mb_info=%p), heap-start=%p\n", magic, mb_info, &_HEAP_START);
+	printf("x86-64: arch_start(magic=%08x, mb_info=%p), heap-start=%p, stack=%p\n", magic, mb_info, &_HEAP_START, rsp);
 
 	harness_init();
 	harness_main();
