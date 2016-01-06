@@ -13,6 +13,8 @@
 
 static char mem_inited = 0;
 
+static char mem_tlb_unified = 0;
+
 // This needs to be super aligned
 static uint32_t section_table[1 << 12] __attribute__((aligned(16384)));
 
@@ -67,9 +69,19 @@ static int mem_create_region_device_mapping(uintptr_t region_start, uintptr_t re
 	return 0;
 }
 
+static void mem_check_is_tlb_unified()
+{
+	uint32_t ctrl;
+	asm("mrc p15, 0, %0, cr0, cr0, 3" : "=r"(ctrl) ::);
+	if(ctrl & 1) mem_tlb_unified = 0;
+	else mem_tlb_unified = 1;
+}
+
 void mem_init()
 {
 	if(mem_inited) return;
+	
+	mem_check_is_tlb_unified();
 	
 	// Write L1 page table location to TTbr
 	write_ttbr((void*)section_table);
@@ -177,7 +189,12 @@ void mem_tlb_flush()
 
 void mem_tlb_evict(uintptr_t ptr)
 {
-	asm("mcr p15, 0, %0, cr8, cr7, 1" ::"r"(ptr):);
+	if(mem_tlb_unified) {
+		asm("mcr p15, 0, %0, cr8, cr7, 1" ::"r"(ptr):);
+	} else {
+		asm("mcr p15, 0, %0, cr8, cr5, 1" ::"r"(ptr):);
+		asm("mcr p15, 0, %0, cr8, cr6, 1" ::"r"(ptr):);
+	}
 }
 
 void mem_cache_flush()
