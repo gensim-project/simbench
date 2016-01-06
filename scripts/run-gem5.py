@@ -2,6 +2,8 @@
 import optparse
 import sys
 
+import time
+
 import m5
 from m5.defines import buildEnv
 from m5.objects import *
@@ -175,4 +177,5 @@ MemConfig.config_mem(options, test_sys)
 root = Root(full_system=True, system=test_sys)
 
 Simulation.setWorkCountOptions(test_sys, options)
+
 Simulation.run(options, root, test_sys, FutureClass)
