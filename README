@@ -32,7 +32,7 @@ arch/$(ARCH)/Make.config.
 
 To run Simbench for the ARM Versatile platform using QEMU:
 
-$ stdbuf -o0 qemu-system-arm -machine versatileab -kernel out/arm/versatile/simbench -nographic | host/host
+$ stdbuf -o0 qemu-system-arm -machine versatileab -kernel out/arm/versatile/simbench -nographic -m 512 | host/host
 
 The stdbuf program is used to disable output buffering so that the timing 
 information produced by Simbench is delivered to the host application in a 
