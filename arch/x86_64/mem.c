@@ -58,7 +58,7 @@ void mem_init()
 	mem_inited = 1;
 	mem_install_page_fault_handler(default_page_fault_handler);
 	
-	initial_pagetables = (uintptr_t)0xc000;
+	initial_pagetables = (uintptr_t)0xb000;
 	runtime_pagetables = (uintptr_t)heap_alloc_page();
 
 	prepare_runtime_pagetables();

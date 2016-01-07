@@ -1,9 +1,9 @@
 .code32
-
+//#define DEBUG_BOOT
 #define MULTIBOOT_HEADER_MAGIC 0x1BADB002
 #define MULTIBOOT_HEADER_FLAGS 0x00000003
 
-#define INIT_PGT	0x0c000
+#define INIT_PGT	0x0b000
 
 .section ".bootstrap", "ax"
 
@@ -85,8 +85,14 @@ start32:
 	// Load the 64-bit GDT
 	lgdt %cs:gdt_ptr
 
+#ifdef DEBUG_BOOT
+	// Print out a debugging message
+	lea msg2, %edi
+	call printstr32
+#endif
+
 	// Chump to the 64-bit entry-point
-	jmp $0x08, $start64
+	ljmp $0x08, $start64
 
 build_pagetables:
 	// PML4 - Single entry
@@ -94,10 +100,53 @@ build_pagetables:
 	or $3, %eax
 	mov %eax, (%edi)
 
-	// PDPT - Map a 1GiB page
-	mov $0x83, %eax
+	// Detect whether or not we can use 1Gb pages
+	mov $0x80000001, %eax
+	cpuid
+	andl $(1<<26), %edx
+
+	jz pt2mb
+
+#ifdef DEBUG_BOOT
+	// Print out a debugging message
+	push %edi
+	lea using_1gb, %edi
+	call printstr32
+	pop %edi
+#endif
+
+	lea 0x2000(%edi), %eax
+	or $0x83, %eax
 	mov %eax, 0x1000(%edi)
 
+	ret
+
+pt2mb:
+#ifdef DEBUG_BOOT
+	// Print out a debugging message
+	push %edi
+	lea using_2mb, %edi
+	call printstr32
+	pop %edi
+#endif
+
+	// PDPT
+	lea 0x2000(%edi), %eax
+	or $3, %eax
+	mov %eax, 0x1000(%edi)
+
+	// PDP - Map a bunch of 2MiB pages
+	mov $0x83, %eax
+	xorl %ecx, %ecx
+
+1:
+	mov %eax, 0x2000(%edi, %ecx, 8)
+	add $0x200000, %eax
+
+	incl %ecx
+	cmp $0x200, %ecx
+	jne 1b
+	
 	ret
 
 #ifdef DEBUG_BOOT
@@ -120,7 +169,7 @@ printstr32:
 start64:
 #ifdef DEBUG_BOOT
 	// Print out a friendly message
-	lea msg2, %rdi
+	lea msg3, %rdi
 	call printstr64
 #endif
 
@@ -165,8 +214,13 @@ printstr64:
 
 .data
 
+#ifdef DEBUG_BOOT
 msg1: .asciz "About to enter long mode...\n"
-msg2: .asciz "Hello from long mode!  Reloading segment registers...\n"
+msg2: .asciz "Really about to enter long mode...\n"
+msg3: .asciz "Hello from long mode!  Reloading segment registers...\n"
+using_2mb: .asciz "Using 2mb pages\n"
+using_1gb: .asciz "Using 1gb pages\n"
+#endif
 
 .align 16
 gdt_ptr:
