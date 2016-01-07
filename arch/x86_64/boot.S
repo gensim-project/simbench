@@ -105,7 +105,7 @@ build_pagetables:
 	cpuid
 	andl $(1<<26), %edx
 
-	jnz pt2mb
+	jz pt2mb
 
 #ifdef DEBUG_BOOT
 	// Print out a debugging message
