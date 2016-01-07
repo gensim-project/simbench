@@ -105,7 +105,7 @@ build_pagetables:
 	cpuid
 	andl $(1<<26), %edx
 
-	jz pt2mb
+	jnz pt2mb
 
 #ifdef DEBUG_BOOT
 	// Print out a debugging message
@@ -115,8 +115,7 @@ build_pagetables:
 	pop %edi
 #endif
 
-	lea 0x2000(%edi), %eax
-	or $0x83, %eax
+	mov $0x83, %eax
 	mov %eax, 0x1000(%edi)
 
 	ret
