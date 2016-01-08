@@ -14,4 +14,8 @@ extern void arch_ifault_install_break();
 
 extern void arch_dfault_install_skip();
 
+extern void arch_syscall_install_skip();
+extern void arch_syscall();
+
+
 #endif

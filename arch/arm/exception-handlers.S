@@ -28,5 +28,9 @@ pabt_return:
 dabt_skip:
 	subs pc, lr, #4
 
+.globl swi_skip
+swi_skip:
+	bx lr
+
 .ltorg
 

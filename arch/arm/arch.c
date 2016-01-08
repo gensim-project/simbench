@@ -5,6 +5,11 @@ void arch_init()
 	
 }
 
+void arch_abort()
+{
+	while(1) ;
+}
+
 void arch_code_flush(size_t address)
 {
 	// From ARM Architecture Ref Manual page 678
@@ -35,4 +40,10 @@ uint32_t arch_nonpriviliged_write(uint32_t *ptr)
 void arch_undefined_instruction()
 {
 	asm(".word 0xe7ffffff\n");
+}
+
+
+void arch_syscall()
+{
+	asm("swi #0\n" :::"lr");
 }
