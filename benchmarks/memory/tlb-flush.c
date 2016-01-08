@@ -49,9 +49,10 @@ static void kernel_mmu()
 		debug_spinner();
 		
 		*(uint32_t*)ptr = 0x12345678;
+		mem_tlb_flush();
+		
 		ptr += pagesize;
 		if(ptr >= virt_end) ptr = virt_start;
-		mem_tlb_flush();
 	}
 }
 static void kernel_mmu_cleanup()
