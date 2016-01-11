@@ -75,7 +75,7 @@ static benchmark_t bmark = {
 	.name="Memory-Cold-NoMMU",
 	.category="Memory",
 	.kernel=kernel,
-	.kernel_control=kernel_control
+	.kernel_control=kernel_control,
 	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS,
 };
 
@@ -84,7 +84,7 @@ static benchmark_t bmark_mmu = {
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel,
-	.kernel_control=kernel_control
+	.kernel_control=kernel_control,
 	.kernel_cleanup=kernel_mmu_cleanup,
 	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
