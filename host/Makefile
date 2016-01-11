@@ -1,6 +1,6 @@
 host : main.c
 	@echo "  CCLD    $@"
-	$(Q)gcc $^ -o $@ -O3 -lrt
+	$(Q)gcc $^ -o $@ -g -O3 -lrt
 
 clean:
 	@echo "  RM      host"
