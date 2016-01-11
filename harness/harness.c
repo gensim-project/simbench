@@ -48,6 +48,15 @@ void harness_execute(benchmark_t *benchmark)
 	
 	if(benchmark->kernel_init) benchmark->kernel_init();
 	
+	uart_puts(" ");
+	uart_puthex(benchmark->iteration_count);
+	
+	if(benchmark->kernel_control) {
+		uart_puts(" {");
+		benchmark->kernel_control();
+		uart_puts("}");
+	}
+	
 	uart_puts(" [");
 	benchmark->kernel();
 	uart_puts("]\r\n");

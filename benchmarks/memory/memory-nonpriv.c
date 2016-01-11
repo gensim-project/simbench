@@ -40,7 +40,8 @@ static benchmark_t bmark_mmu = {
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel,
-	.kernel_cleanup=kernel_mmu_cleanup
+	.kernel_cleanup=kernel_mmu_cleanup,
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
 
 REG_BENCHMARK(bmark_mmu);

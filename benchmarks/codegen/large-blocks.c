@@ -5,7 +5,7 @@
 
 #include "define.h"
 
-#define CODEGEN_ITERATIONS 1
+#define CODEGEN_ITERATIONS 100
 
 static volatile uint32_t value1;
 static volatile uint32_t value2;
@@ -94,9 +94,27 @@ static void ALIGN kernel()
 	}
 }
 
+static void ALIGN kernel_control()
+{
+	uint64_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
+	uint64_t i;
+	volatile uint8_t* block_ptr = (volatile uint8_t*)block;
+	uint8_t v;
+	debug_spinner_start(CODEGEN_ITERATIONS);
+	
+	for(i=0; i < total_iterations; ++i) {
+		debug_spinner();
+		block();
+		v = *block_ptr;
+		arch_code_flush((size_t)block);
+	}
+}
+
 static benchmark_t bmark = {
 	.name="Large-Blocks",
 	.category="Codegen",
-	.kernel=kernel
+	.kernel=kernel,
+	.kernel_control=kernel_control,
+	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS
 };
 REG_BENCHMARK(bmark);

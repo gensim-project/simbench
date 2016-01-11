@@ -101,6 +101,7 @@ static void ALIGN kernel()
 static benchmark_t bmark = {
 	.name="Inter-Page-Direct",
 	.category="Dispatch",
-	.kernel=kernel
+	.kernel=kernel,
+	.iteration_count = DISPATCH_ITERATIONS * BENCHMARK_ITERATIONS
 };
 REG_BENCHMARK(bmark);

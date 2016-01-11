@@ -27,6 +27,7 @@ static benchmark_t bmark = {
 	.name="Device-Access",
 	.category="IO",
 	.kernel=kernel,
+	.iteration_count = BENCHMARK_ITERATIONS * IO_BENCHMARK_ITERATIONS
 };
 
 REG_BENCHMARK(bmark);

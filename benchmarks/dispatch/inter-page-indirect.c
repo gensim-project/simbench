@@ -50,6 +50,7 @@ static void kernel()
 static benchmark_t bmark = {
 	.name="Inter-Page-Indirect",
 	.category="Dispatch",
-	.kernel=kernel
+	.kernel=kernel,
+	.iteration_count = DISPATCH_ITERATIONS * BENCHMARK_ITERATIONS
 };
 REG_BENCHMARK(bmark);

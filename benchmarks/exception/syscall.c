@@ -41,7 +41,8 @@ static benchmark_t bmark = {
 	.category="Exception",
 	.kernel_init=kernel_init,
 	.kernel=kernel,
-	.kernel_cleanup=kernel_cleanup
+	.kernel_cleanup=kernel_cleanup,
+	.iteration_count = EXCEPTION_BENCHMARK_ITERATIONS * BENCHMARK_ITERATIONS
 };
 
 REG_BENCHMARK(bmark);

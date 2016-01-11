@@ -4,7 +4,7 @@
 #include "harness.h"
 #include "mem.h"
 
-#define EXCEPTION_BENCHMARK_ITERATIONS 50000
+#define EXCEPTION_BENCHMARK_ITERATIONS 5000
 
 static void (*ptr)() = (void (*))0xc0000000;
 
@@ -42,7 +42,8 @@ static benchmark_t bmark = {
 	.category="Exception",
 	.kernel_init=kernel_init,
 	.kernel=kernel,
-	.kernel_cleanup=kernel_cleanup
+	.kernel_cleanup=kernel_cleanup,
+	.iteration_count = EXCEPTION_BENCHMARK_ITERATIONS * BENCHMARK_ITERATIONS
 };
 
 REG_BENCHMARK(bmark);

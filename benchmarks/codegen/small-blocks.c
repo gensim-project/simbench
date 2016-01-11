@@ -3,7 +3,7 @@
 #include "benchmark.h"
 #include "harness.h"
 
-#define CODEGEN_ITERATIONS 1
+#define CODEGEN_ITERATIONS 100
 
 static benchmark_kernel_t volatile fn_table[];
 
@@ -28,6 +28,18 @@ static void ALIGN copy_code()
 	for(i=0; i < sizeof(fn_table)/sizeof(*fn_table); ++i) {
 		volatile uint8_t* fn_head = (volatile uint8_t*)fn_table[i];
 		*fn_head = *fn_head;
+		arch_code_flush((size_t)fn_head);
+	}
+}
+
+// Make the code region dirty, so that it will be retranslated next time it is executed
+static void ALIGN copy_code_control()
+{
+	int i = 0;
+	volatile uint8_t v;
+	for(i=0; i < sizeof(fn_table)/sizeof(*fn_table); ++i) {
+		volatile uint8_t* fn_head = (volatile uint8_t*)fn_table[i];
+		v = *fn_head;
 		arch_code_flush((size_t)fn_head);
 	}
 }
@@ -60,10 +72,26 @@ static void ALIGN kernel()
 	}
 }
 
+static void ALIGN kernel_control()
+{
+	uint32_t i;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
+	
+	debug_spinner_start(CODEGEN_ITERATIONS);
+	
+	for(i = 0; i < total_iterations; ++i) {
+		debug_spinner();
+		run_code();
+		copy_code_control();
+	}
+}
+
 static benchmark_t bmark = {
 	.name="Small-Blocks",
 	.category="Codegen",
 	.kernel_init=kernel_init,
-	.kernel=kernel
+	.kernel=kernel,
+	.kernel_control=kernel_control,
+	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS
 };
 REG_BENCHMARK(bmark);

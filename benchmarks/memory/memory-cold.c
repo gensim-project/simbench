@@ -27,6 +27,27 @@ static void ALIGN kernel()
 	}
 }
 
+static void kernel_control()
+{
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+
+	const phys_mem_info_t *phys_mem = mem_get_phys_info();
+	uintptr_t mem_region_start = phys_mem->phys_mem_start;
+	uintptr_t mem_region_end =   phys_mem->phys_mem_end;
+	
+	uint32_t page_size = 4096;
+	
+	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	
+	int it;
+	uintptr_t ptr = mem_region_start;
+	for(it = 0; it < total_iterations; ++it) {
+		debug_spinner();
+		ptr += page_size;
+		if(ptr >= mem_region_end) ptr = mem_region_start;
+	}
+}
+
 static void kernel_mmu_init()
 {
 	mem_init();
@@ -53,7 +74,9 @@ static void kernel_mmu_cleanup()
 static benchmark_t bmark = {
 	.name="Memory-Cold-NoMMU",
 	.category="Memory",
-	.kernel=kernel
+	.kernel=kernel,
+	.kernel_control=kernel_control
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS,
 };
 
 static benchmark_t bmark_mmu = {
@@ -61,7 +84,9 @@ static benchmark_t bmark_mmu = {
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel,
+	.kernel_control=kernel_control
 	.kernel_cleanup=kernel_mmu_cleanup,
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
 
 REG_BENCHMARK(bmark);

@@ -15,8 +15,9 @@ typedef struct {
 	const char *category;
 	benchmark_kernel_t kernel_init;
 	benchmark_kernel_t kernel;
-	benchmark_kernel_t control_kernel;
 	benchmark_kernel_t kernel_cleanup;
+	benchmark_kernel_t kernel_control;
+	uint64_t iteration_count;
 } benchmark_t;
 
 #endif

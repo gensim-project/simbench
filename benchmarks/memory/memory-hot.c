@@ -31,6 +31,19 @@ static void ALIGN kernel()
 	}
 }
 
+static void kernel_control()
+{
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+	uint32_t i;
+	
+	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	uint32_t value;
+	
+	for(i = 0; i < total_iterations; ++i) {
+		debug_spinner();
+	}
+}
+
 static void kernel_mmu_init()
 {
 	mem_init();
@@ -47,7 +60,9 @@ static void kernel_mmu_cleanup()
 static benchmark_t bmark = {
 	.name="Memory-Hot-NoMMU",
 	.category="Memory",
-	.kernel=kernel
+	.kernel=kernel,
+	.kernel_control=kernel_control,
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
 
 static benchmark_t bmark_mmu = {
@@ -55,7 +70,9 @@ static benchmark_t bmark_mmu = {
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel,
-	.kernel_cleanup=kernel_mmu_cleanup
+	.kernel_control=kernel_control,
+	.kernel_cleanup=kernel_mmu_cleanup,
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
 
 REG_BENCHMARK(bmark);
