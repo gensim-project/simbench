@@ -3,6 +3,18 @@
 #include "printf.h"
 #include "debug.h"
 
+#define DEBUG_MEM
+
+#if !defined(SIMBENCH_DEBUG) && defined(DEBUG_MEM)
+#warning "DEBUG_MEM defined, but SIMBENCH_DEBUG not defined"
+#endif
+
+#ifdef DEBUG_MEM
+#define mem_dprintf(a...) dprintf(a)
+#else
+#define mem_dprintf(a...) do { } while(0)
+#endif
+
 static char mem_inited = 0;
 
 static char mem_tlb_unified = 0;
@@ -53,7 +65,7 @@ static int mem_create_region_device_mapping(uintptr_t region_start, uintptr_t re
 	
 	for(i = region_start; i <= region_end; i += page_size) {
 		if(mem_create_page_mapping_device(i, i)) {
-			dprintf("Failed to map a device at %p!\r\n", i);
+			mem_dprintf("Failed to map a device at %p!\r\n", i);
 			return 1;
 		}
 	}
@@ -96,17 +108,17 @@ void mem_init()
 	bzero((void*)section_table, sizeof(section_table));
 	
 	// Initialise page table with mappings for code and data sections
-	dprintf("Mapping vectors\r\n");
+	mem_dprintf("Mapping vectors\r\n");
 	mem_create_region_id_mapping((uintptr_t)&vectors_start, (uintptr_t)&vectors_end);
 
-	dprintf("Mapping text\r\n");
+	mem_dprintf("Mapping text\r\n");
 	mem_create_region_id_mapping((uintptr_t)&_TEXT_START, (uintptr_t)&_TEXT_END);
 	
-	dprintf("Mapping data\r\n");
+	mem_dprintf("Mapping data\r\n");
 	mem_create_region_id_mapping((uintptr_t)&_DATA_START, (uintptr_t)&_DATA_END);
 	
 	const phys_mem_info_t *dev_info = mem_get_device_info();
-	dprintf("Mapping devices\r\n");
+	mem_dprintf("Mapping devices\r\n");
 	while(dev_info) {
 		mem_create_region_device_mapping(dev_info->phys_mem_start, dev_info->phys_mem_end);
 		dev_info = dev_info->next_mem;
@@ -121,19 +133,19 @@ void mem_init()
 	uintptr_t vector_ppage = vector_paddr & ~(mem_get_page_size()-1);
 
 	asm("mrc p15, 0, %0, cr1, cr0, 0\n" : "=r"(ctrl));
-	dprintf("Got control word %x\r\n", ctrl);
+	mem_dprintf("Got control word %x\r\n", ctrl);
 
 	if(ctrl & (1 << 13)) {
 		// Vectors are high
 		vector_vaddr = 0xffff0000;
 		vector_vpage = vector_vaddr & ~(mem_get_page_size()-1);
-		dprintf("High vectors detected @ %p\r\n", vector_vaddr);
+		mem_dprintf("High vectors detected @ %p\r\n", vector_vaddr);
 		
 	} else {
 		// Vectors are low
 		vector_vaddr = 0;
 		vector_vpage = 0;
-		dprintf("Low vectors detected\r\n");
+		mem_dprintf("Low vectors detected\r\n");
 	}
 	
 	// Make sure that low bits of virtual and physical vector bases match
@@ -144,7 +156,7 @@ void mem_init()
 		arch_abort();
 	}
 	
-	dprintf("Mapping vectors\r\n");	
+	mem_dprintf("Mapping vectors\r\n");	
 	mem_create_page_mapping(vector_ppage, vector_vpage);
 	
 	// Also ID map the physical location of the vectors
@@ -153,7 +165,7 @@ void mem_init()
 	
 	// (Note that the vectors now have two virtual mappings: one with VA=PA, and one with VA=Exception Vector Base)
 	
-	dprintf("Writing DACR\r\n");
+	mem_dprintf("Writing DACR\r\n");
 	write_dacr(0xffffffff);
 	
 	mem_inited = 1;
@@ -226,7 +238,7 @@ size_t mem_get_page_size()
 
 int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 {
-	dprintf("Mapping va=%p to pa=%p\r\n", virt_addr, phys_addr);
+	mem_dprintf("Mapping va=%p to pa=%p\r\n", virt_addr, phys_addr);
 
 	// Ensure that phys and virt addrs are page aligned
 	if(phys_addr & (mem_get_page_size()-1) || virt_addr & (mem_get_page_size()-1)) {
@@ -246,11 +258,11 @@ int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 
 int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 {
-	dprintf("Mapping Device va=%p to pa=%p\r\n", virt_addr, phys_addr);
+	mem_dprintf("Mapping Device va=%p to pa=%p\r\n", virt_addr, phys_addr);
 	
 	// Ensure that phys and virt addrs are page aligned
 	if(phys_addr & (mem_get_page_size()-1) || virt_addr & (mem_get_page_size()-1)) {
-		dprintf(" *** TRIED TO DEVICE MAP A MISALIGNED ADDRESS! *** \r\n");
+		mem_dprintf(" *** TRIED TO DEVICE MAP A MISALIGNED ADDRESS! *** \r\n");
 		return 1;
 	}
 	// Create a section descriptor pointing to the given physical address
