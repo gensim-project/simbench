@@ -1,4 +1,5 @@
 #include "arch.h"
+#include "debug.h"
 
 void arch_init()
 {
@@ -7,6 +8,7 @@ void arch_init()
 
 void arch_abort()
 {
+	dprintf("arm: abort!\n");
 	while(1) ;
 }
 
