@@ -43,6 +43,9 @@ static void kernel_control()
 	uintptr_t ptr = mem_region_start;
 	for(it = 0; it < total_iterations; ++it) {
 		debug_spinner();
+		
+		asm volatile ("");
+		
 		ptr += page_size;
 		if(ptr >= mem_region_end) ptr = mem_region_start;
 	}

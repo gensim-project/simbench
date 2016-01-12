@@ -4,7 +4,7 @@
 
 #include "define.h"
 
-#define CODEGEN_ITERATIONS 100
+#define CODEGEN_ITERATIONS 1
 
 static volatile uint32_t value1;
 static volatile uint32_t value2;
