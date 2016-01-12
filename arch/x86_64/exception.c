@@ -2,6 +2,7 @@
 #include "x86.h"
 #include "decode.h"
 #include "printf.h"
+#include "irq.h"
 
 static void return_handler(struct mcontext *mcontext, uint64_t va)
 {
@@ -11,7 +12,7 @@ static void return_handler(struct mcontext *mcontext, uint64_t va)
 
 void arch_ifault_install_return()
 {
-	mem_install_page_fault_handler(return_handler);
+	irq_install_page_fault_handler(return_handler);
 }
 
 void arch_ifault_install_break()
@@ -19,7 +20,7 @@ void arch_ifault_install_break()
 	arch_abort();
 }
 
-static void skip_handler(struct mcontext *mcontext, uint64_t va)
+static void mem_skip_handler(struct mcontext *mcontext, uint64_t va)
 {
 	struct instruction inst;
 
@@ -43,7 +44,7 @@ static void skip_handler(struct mcontext *mcontext, uint64_t va)
 
 void arch_dfault_install_skip()
 {
-	mem_install_page_fault_handler(skip_handler);
+	irq_install_page_fault_handler(mem_skip_handler);
 }
 
 static void syscall_skip_handler(struct mcontext *mcontext)

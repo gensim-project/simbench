@@ -11,8 +11,4 @@ struct mcontext
 	uint64_t flags, rsp, extra, rip, tempCS, tempFLAGS, tempSP, tempSS;
 } __attribute__((packed));
 
-typedef void (*page_fault_handler_fn_t)(struct mcontext *, uint64_t);
-
-extern void mem_install_page_fault_handler(page_fault_handler_fn_t handler_fn);
-
 #endif /* X86_H */

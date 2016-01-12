@@ -30,7 +30,9 @@ void console_init()
 
 void console_clear()
 {
-	for (int i = 0; i < ROWS * COLUMNS; i++) {
+	int i;
+	
+	for (i = 0; i < ROWS * COLUMNS; i++) {
 		vga[i] = 0;
 	}
 
@@ -40,19 +42,21 @@ void console_clear()
 
 static void new_line()
 {
+	int y, x;
+	
 	cur_x = 0;
 
 	cur_y++;
 	if (cur_y >= ROWS) {
 		cur_y = ROWS - 1;
 		
-		for (int y = 0; y < ROWS - 1; y++) {
-			for (int x = 0; x < COLUMNS; x++) {
+		for (y = 0; y < ROWS - 1; y++) {
+			for (x = 0; x < COLUMNS; x++) {
 				*slot_from_xy(x, y) = *slot_from_xy(x, y + 1);
 			}
 		}
 		
-		for (int x = 0; x < COLUMNS; x++) {
+		for (x = 0; x < COLUMNS; x++) {
 			*slot_from_xy(x, ROWS - 1) = 0;
 		}
 	}

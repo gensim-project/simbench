@@ -1,10 +1,9 @@
 #include "arch.h"
 #include "mem.h"
+#include "irq.h"
 #include "x86.h"
 #include "printf.h"
 #include "heap.h"
-
-page_fault_handler_fn_t page_fault_handler_fn;
 
 static uintptr_t initial_pagetables;
 static uintptr_t runtime_pagetables;
@@ -13,11 +12,6 @@ extern char _TEXT_START, _TEXT_END, _DATA_START, _DATA_END, _HEAP_START, _HEAP_S
 
 #define PAGE_ADDR(a) (uintptr_t)&(a)
 #define NR_PAGES(a, b) ((((uintptr_t)&(b) - (uintptr_t)&(a)) / 0x1000) + 1)
-
-void mem_install_page_fault_handler(page_fault_handler_fn_t handler_fn)
-{
-	page_fault_handler_fn = handler_fn;
-}
 
 static void map_page_ranges(uintptr_t phys_addr, uintptr_t virt_addr, int nr_pages)
 {
@@ -43,20 +37,16 @@ static void prepare_runtime_pagetables()
 	map_page_ranges(PAGE_ADDR(_HEAP_START), PAGE_ADDR(_HEAP_START), ((uintptr_t)&_HEAP_SIZE) >> 12);
 }
 
-static void default_page_fault_handler(struct mcontext *mcontext, uint64_t va)
-{
-	printf("unhandled page-fault: code=%lx, rip=%p, va=%p\n", mcontext->extra, mcontext->rip, va);
-	arch_abort();
-}
+
 
 static int mem_inited;
 
 void mem_init()
 {
 	if (mem_inited) return;
-	
 	mem_inited = 1;
-	mem_install_page_fault_handler(default_page_fault_handler);
+	
+	irq_reset_page_fault_handler();
 	
 	initial_pagetables = (uintptr_t)0xb000;
 	runtime_pagetables = (uintptr_t)heap_alloc_page();
@@ -66,7 +56,7 @@ void mem_init()
 
 void mem_reset()
 {
-	mem_install_page_fault_handler(default_page_fault_handler);
+	irq_reset_page_fault_handler();
 	
 	// TODO: Reset page mappings?
 }

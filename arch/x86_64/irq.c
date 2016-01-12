@@ -15,7 +15,6 @@ struct IDT {
 } __attribute__((packed));
 
 typedef void (*trap_fn_t)(struct mcontext *);
-typedef void (*syscall_handler_fn_t)(struct mcontext *);
 
 extern void trap_unknown(struct mcontext *);
 extern void trap_unknown_arg(struct mcontext *);
@@ -23,10 +22,17 @@ extern void trap_page_fault(struct mcontext *);
 extern void trap_syscall(struct mcontext *);
 
 syscall_handler_fn_t syscall_handler_fn;
+page_fault_handler_fn_t page_fault_handler_fn;
 
 static void default_syscall_handler(struct mcontext *ctx)
 {
-	printf("x86: unhandled syscall\n");
+	printf("x86: unhandled syscall: rip=%p\n", ctx->rip);
+	arch_abort();
+}
+
+static void default_page_fault_handler(struct mcontext *mcontext, uint64_t va)
+{
+	printf("x86: unhandled page-fault: code=%lx, rip=%p, va=%p\n", mcontext->extra, mcontext->rip, va);
 	arch_abort();
 }
 
@@ -45,6 +51,8 @@ static void set_idt(struct IDT *idt, trap_fn_t fn, int allow_user)
 
 void irq_init()
 {
+	int i;
+	
 	struct {
 		uint16_t limit;
 		uint64_t base;
@@ -56,7 +64,7 @@ void irq_init()
 	struct IDT *idt = (struct IDT *)IDTR.base;
 
 	// Initialise the table with unknowns
-	for (int i = 0; i < 0x100; i++) {
+	for (i = 0; i < 0x100; i++) {
 		set_idt(&idt[i], trap_unknown, 0);
 	}
 
@@ -73,12 +81,28 @@ void irq_init()
 
 	asm volatile("lidt %0\n" :: "m"(IDTR));
 
-	syscall_handler_fn = default_syscall_handler;
+	irq_reset_syscall_handler();
+	irq_reset_page_fault_handler();
 }
 
 void irq_install_syscall_handler(syscall_handler_fn_t handler_fn)
 {
 	syscall_handler_fn = handler_fn;
+}
+
+void irq_install_page_fault_handler(page_fault_handler_fn_t handler_fn)
+{
+	page_fault_handler_fn = handler_fn;
+}
+
+void irq_reset_syscall_handler()
+{
+	syscall_handler_fn = default_syscall_handler;
+}
+
+void irq_reset_page_fault_handler()
+{
+	page_fault_handler_fn = default_page_fault_handler;
 }
 
 void handle_trap_unknown(struct mcontext *mcontext)
