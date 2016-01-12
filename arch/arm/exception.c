@@ -46,3 +46,28 @@ void arch_syscall_install_skip()
 {
 	install_swi((uint32_t)swi_skip);
 }
+
+#define MODE_IRQ_DISABLE (1 << 7) 
+void arch_irq_enable()
+{
+	uint32_t mode;
+	asm("mrs %0, CPSR" : "=r"(mode));
+	mode &= ~MODE_IRQ_DISABLE;
+	asm("msr CPSR_c, %0" ::"r"(mode));
+}
+
+void arch_irq_disable()
+{
+	uint32_t mode;
+	asm("mrs %0, CPSR" : "=r"(mode));
+	mode |= MODE_IRQ_DISABLE;
+	asm("msr CPSR_c, %0" ::"r"(mode));	
+}
+
+extern irq_handler_t arch_irq_handler;
+void arch_irq_install_handler(irq_handler_t handler)
+{
+	arch_irq_handler = handler;
+}
+
+

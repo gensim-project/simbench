@@ -43,3 +43,8 @@ void arch_start(unsigned int magic, void *mb_info)
 	harness_main();
 	platform_shutdown();
 }
+
+void arch_coprocessor_access()
+{
+	arch_abort();
+}

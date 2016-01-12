@@ -73,9 +73,10 @@ pabt_handler:
 dabt_handler:
 .word default_handler
 
+.extern irq_handler_tramp
 .globl irq_handler
 irq_handler:
-.word default_handler
+.word irq_handler_tramp
 
 .globl fiq_handler
 fiq_handler:

@@ -32,5 +32,20 @@ dabt_skip:
 swi_skip:
 	bx lr
 
+
+.globl irq_handler_tramp
+irq_handler_tramp:
+	push {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,lr}
+	
+	ldr r0, arch_irq_handler
+	blx r0
+	
+	pop {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,lr}
+	movs pc, lr
+
+.globl arch_irq_handler
+arch_irq_handler:
+.word 0x0
+
 .ltorg
 

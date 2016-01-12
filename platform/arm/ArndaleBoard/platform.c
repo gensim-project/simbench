@@ -26,3 +26,13 @@ uint32_t platform_get_null_devval()
 	// Return value to enable all LEDs
 	return LEDS_VAL;
 }
+
+void platform_trigger_swi()
+{
+
+}
+
+void platform_clear_swi()
+{
+
+}

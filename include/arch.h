@@ -17,5 +17,13 @@ extern void arch_dfault_install_skip();
 extern void arch_syscall_install_skip();
 extern void arch_syscall();
 
+extern void arch_coprocessor_access();
+
+extern void arch_irq_enable();
+extern void arch_irq_disable();
+
+typedef void (*irq_handler_t)();
+extern void arch_irq_install_handler(irq_handler_t);
+
 
 #endif

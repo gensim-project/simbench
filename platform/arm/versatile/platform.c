@@ -25,3 +25,18 @@ uint32_t platform_get_null_devval()
 	// Return value to enable all LEDs
 	return 0xff;
 }
+
+#define PL190_BASE 0x10140000
+void platform_trigger_swi()
+{
+	//Enable interrupt channel 0
+	*(volatile uint32_t*)(PL190_BASE + 0x10) = 0x1;
+	
+	//Trigger a SWI on the PL190 interrupt controller
+	*(volatile uint32_t*)(PL190_BASE + 0x18) = 0x1;
+}
+
+void platform_clear_swi()
+{
+	*(volatile uint32_t*)(PL190_BASE + 0x1C) = 0x1;
+}

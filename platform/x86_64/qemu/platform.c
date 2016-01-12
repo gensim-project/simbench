@@ -36,3 +36,13 @@ uint32_t platform_get_null_devval()
 {
 	return 0xff;
 }
+
+void platform_trigger_swi()
+{
+
+}
+
+void platform_clear_swi()
+{
+
+}

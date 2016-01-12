@@ -49,3 +49,9 @@ void arch_syscall()
 {
 	asm("swi #0\n" :::"lr");
 }
+
+void arch_coprocessor_access()
+{
+	
+}
+
