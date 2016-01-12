@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "harness.h"
 #include "mem.h"
+#include "arch.h"
 
 #define MEMORY_BENCHMARK_ITERATIONS 100000
 
@@ -16,7 +17,7 @@ static void ALIGN kernel()
 		
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
-		arch_nonpriviliged_write(&value);
+		arch_nonpriviliged_read(&value);
 	}
 }
 

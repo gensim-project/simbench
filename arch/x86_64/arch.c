@@ -22,7 +22,7 @@ void arch_code_flush(size_t address)
 	asm volatile("wbinvd\n");
 }
 
-uint32_t arch_nonpriviliged_write(uint32_t *ptr)
+uint32_t arch_nonpriviliged_read(volatile uint32_t *ptr)
 {
 	return *ptr;
 }

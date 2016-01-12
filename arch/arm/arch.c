@@ -30,7 +30,7 @@ void arch_code_flush(size_t address)
 	asm("mcr p15, 0, %0, c7, c5, 4" :: "r"(0));
 }
 
-uint32_t arch_nonpriviliged_write(uint32_t *ptr)
+uint32_t arch_nonpriviliged_read(volatile uint32_t *ptr)
 {
 	uint32_t data;
 	asm("ldrt %0, [%1]" : "=&r"(data) : "r"(ptr));
