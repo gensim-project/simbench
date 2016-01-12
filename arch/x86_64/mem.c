@@ -2,7 +2,7 @@
 #include "mem.h"
 #include "irq.h"
 #include "x86.h"
-#include "printf.h"
+#include "debug.h"
 #include "heap.h"
 
 static uintptr_t initial_pagetables;

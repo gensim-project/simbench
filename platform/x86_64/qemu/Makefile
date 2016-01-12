@@ -1,1 +1,1 @@
-OBJ := uart.o platform.o mem.o console.o
+OBJ := platform.o mem.o console.o

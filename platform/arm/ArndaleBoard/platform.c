@@ -6,8 +6,8 @@
 void platform_init()
 {
 	uart_init();
-	printf_register_stdout(uart_putc);
-	printf_register_uart(uart_putc);
+	printf_register_output(uart_putc);
+	printf_register_debug(uart_putc);
 }
 
 void platform_shutdown()

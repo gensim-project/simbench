@@ -1,7 +1,7 @@
 #include "arch.h"
 #include "x86.h"
 #include "decode.h"
-#include "printf.h"
+#include "debug.h"
 #include "irq.h"
 
 static void return_handler(struct mcontext *mcontext, uint64_t va)
@@ -27,14 +27,14 @@ static void mem_skip_handler(struct mcontext *mcontext, uint64_t va)
 	if (!decode_instruction((const uint8_t *)mcontext->rip, &inst)) {
 		int i;
 
-		printf("x86: unable to decode instruction @ %p\n", mcontext->rip);
-		printf("code: ");
+		dprintf("x86: unable to decode instruction @ %p\n", mcontext->rip);
+		dprintf("code: ");
 
 		for (i = 0; i < 32; i++) {
-			printf("%02x ", ((uint8_t *)mcontext->rip)[i]);
+			dprintf("%02x ", ((uint8_t *)mcontext->rip)[i]);
 		}
 
-		printf("\n");
+		dprintf("\n");
 
 		arch_abort();
 	}

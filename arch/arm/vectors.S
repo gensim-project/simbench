@@ -88,22 +88,18 @@ default_handler:
 	b default_handler
 
 .globl default_undef_handler
-.extern uart_puts
-.extern uart_puthex
+.extern fprintf
+.extern ERROR
 default_undef_handler:
 	mov r5, lr
-	ldr r0, =2f
-	bl uart_puts
-	sub r0, r5, #4
-	bl uart_puthex
-	ldr r0, =3f
-	bl uart_puts
+	ldr r0, =ERROR
+	ldr r1, =2f
+	sub r2, r5, #4
+	bl fprintf
 1:
 	b 1b
 2:
-.asciz "Undefined instruction at address "
-3:
-.asciz "\r\n"
+.asciz "Undefined instruction at address %p\r\n"
 
 .global vectors_end
 vectors_end:

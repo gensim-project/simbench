@@ -172,8 +172,10 @@ retry_format:
 			{
 				unsigned long long int v;
 
-				if (number_size == 8 || *fmt == 'p') {
+				if (number_size == 8) {
 					v = va_arg(args, unsigned long long int);
+				} else if (*fmt == 'p') {
+					v = (unsigned long long int)va_arg(args, unsigned long);
 				} else {
 					v = (unsigned long long int)va_arg(args, unsigned int);
 				}
@@ -230,20 +232,27 @@ retry_format:
 	return count;
 }
 
-static FILE stdout_file;
-static FILE uart_file;
+static FILE output_file;
+static FILE debug_file;
+static FILE error_file;
 
-FILE *STDOUT = &stdout_file;
-FILE *UART = &uart_file;
+FILE *OUTPUT = &output_file;
+FILE *DEBUG = &debug_file;
+FILE *ERROR = &error_file;
 
-void printf_register_stdout(putch_fn_t putch_fn)
+void printf_register_output(putch_fn_t putch_fn)
 {
-	stdout_file.putch_fn = putch_fn;
+	output_file.putch_fn = putch_fn;
 }
 
-void printf_register_uart(putch_fn_t putch_fn)
+void printf_register_debug(putch_fn_t putch_fn)
 {
-	uart_file.putch_fn = putch_fn;
+	debug_file.putch_fn = putch_fn;
+}
+
+void printf_register_error(putch_fn_t putch_fn)
+{
+	error_file.putch_fn = putch_fn;
 }
 
 int fprintf(FILE *f, const char *fmt, ...)
@@ -265,30 +274,6 @@ int fprintf(FILE *f, const char *fmt, ...)
 		}
 
 		f->putch_fn(buffer[i]);
-	}
-
-	return rc;
-}
-
-int printf(const char *fmt, ...)
-{
-	char buffer[0x1000];
-	int rc, i;
-	va_list args;
-	
-	if (!STDOUT) return 0;
-	if (!STDOUT->putch_fn) return 0;
-
-	va_start(args, fmt);
-	rc = vsnprintf(buffer, 0x1000, fmt, args);
-	va_end(args);
-
-	for (i = 0; i < 0x1000; i++) {
-		if (buffer[i] == 0) {
-			break;
-		}
-
-		STDOUT->putch_fn(buffer[i]);
 	}
 
 	return rc;

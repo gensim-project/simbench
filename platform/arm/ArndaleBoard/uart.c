@@ -41,26 +41,3 @@ void uart_putc(char c)
 
 	regs->utxh = c;
 }
-
-void uart_puts(const char *s)
-{
-	while(*s) {
-		uart_putc(*s);
-		s++;
-	}
-}
-
-static char hexchars[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' };
-
-void uart_puthex(uint32_t x)
-{
-	int32_t shift = 28;
-	while(shift >= 0) {
-		uint32_t val = x >> shift;
-		val &= 0xf;
-		
-		uart_putc(hexchars[val]);
-				
-		shift -= 4;
-	}
-}
