@@ -66,6 +66,16 @@ trap_\name:
 trap_macro unknown,0
 trap_macro unknown_arg,1
 
+.extern syscall_handler_fn
+.globl trap_syscall
+trap_syscall:
+	enter_intr 0
+
+	lea syscall_handler_fn, %rcx
+	call *(%rcx)
+
+	exit_intr
+
 .extern page_fault_handler_fn
 .globl trap_page_fault
 trap_page_fault:

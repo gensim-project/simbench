@@ -8,13 +8,13 @@ void platform_init()
 	uart_init();
 	printf_register_uart(uart_putc);
 
-	console_init();	
+	console_init();
 	printf_register_stdout(console_putc);
 }
 
 void platform_shutdown()
 {
-	
+
 }
 
 uint32_t* platform_get_null_devptr()

@@ -43,13 +43,3 @@ void arch_start(unsigned int magic, void *mb_info)
 	harness_main();
 	platform_shutdown();
 }
-
-void arch_syscall_install_skip()
-{
-	arch_abort();
-}
-
-void arch_syscall()
-{
-	arch_abort();
-}

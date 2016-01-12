@@ -50,7 +50,7 @@ const char *x86_register_names[] = {
 	"r13b",
 	"r14b",
 	"r15b",
-	
+
 	"r8w",		// 44
 	"r9w",
 	"r10w",
@@ -104,11 +104,11 @@ typedef enum
 
 	O_R_M8,
 	O_R_M16,
-	
+
 	O_IMM16_32,
-	
+
 	O_MOFFS_16_32_64,
-			
+
 	O_RAX,
 } X86OperandTypes;
 
@@ -126,7 +126,7 @@ static X86InstructionPrefixes read_prefixes(const uint8_t **code)
 		switch (**code) {
 		case 0x67: p = (X86InstructionPrefixes)(p | ADDRESS_SIZE_OVERRIDE); break;
 		case 0x66: p = (X86InstructionPrefixes)(p | OPERAND_SIZE_OVERRIDE); break;
-		
+
 		case 0x40: p = (X86InstructionPrefixes)(p | REX); break;
 		case 0x41: p = (X86InstructionPrefixes)(p | REX | REX_B); break;
 		case 0x42: p = (X86InstructionPrefixes)(p | REX | REX_X); break;
@@ -143,7 +143,7 @@ static X86InstructionPrefixes read_prefixes(const uint8_t **code)
 		case 0x4d: p = (X86InstructionPrefixes)(p | REX | REX_W | REX_R | REX_B); break;
 		case 0x4e: p = (X86InstructionPrefixes)(p | REX | REX_W | REX_R | REX_X); break;
 		case 0x4f: p = (X86InstructionPrefixes)(p | REX | REX_W | REX_R | REX_X | REX_B); break;
-		
+
 		default: prefixes_complete = 1; continue;
 		}
 
@@ -163,7 +163,7 @@ static X86ModRM read_modrm(const uint8_t **code)
 	ret.rm = (val >> 0) & 7;
 
 	(*code)++;
-	
+
 	return ret;
 }
 
@@ -196,7 +196,7 @@ static int decode_reg_operand(struct operand *oper, X86InstructionPrefixes pfx, 
 			case 6: if (pfx & REX) oper->reg = REG_SIL; else oper->reg = REG_DH; break;
 			case 7: if (pfx & REX) oper->reg = REG_DIL; else oper->reg = REG_BH; break;
 			default: return 0;
-			}			
+			}
 		}
 		break;
 
@@ -212,7 +212,7 @@ static int decode_reg_operand(struct operand *oper, X86InstructionPrefixes pfx, 
 			case 6: if (pfx & REX_W) oper->reg = REG_R14; else if (pfx & OPERAND_SIZE_OVERRIDE) oper->reg = REG_R14W; else oper->reg = REG_R14D; break;
 			case 7: if (pfx & REX_W) oper->reg = REG_R15; else if (pfx & OPERAND_SIZE_OVERRIDE) oper->reg = REG_R15W; else oper->reg = REG_R15D; break;
 			default: return 0;
-			}			
+			}
 		} else {
 			switch (reg) {
 			case 0: if (pfx & REX_W) oper->reg = REG_RAX; else if (pfx & OPERAND_SIZE_OVERRIDE) oper->reg = REG_AX; else oper->reg = REG_EAX; break;
@@ -226,7 +226,7 @@ static int decode_reg_operand(struct operand *oper, X86InstructionPrefixes pfx, 
 			default: return 0;
 			}
 		}
-		
+
 		break;
 
 	default:
@@ -350,7 +350,7 @@ static int decode_rm_operand(const uint8_t **code, struct operand *oper, X86Inst
 			case 7:	if (pfx & ADDRESS_SIZE_OVERRIDE) oper->mem.base = REG_EDI; else oper->mem.base = REG_RDI; break;
 			}
 		}
-		
+
 		break;
 
 	case 1:
@@ -384,16 +384,16 @@ static int decode_rm_operand(const uint8_t **code, struct operand *oper, X86Inst
 			case 7:	if (pfx & ADDRESS_SIZE_OVERRIDE) oper->mem.base = REG_EDI; else oper->mem.base = REG_RDI; break;
 			}
 		}
-		
+
 		break;
-		
+
 	case 2:
 		oper->type = OPERAND_MEMORY;
-		
+
 		oper->mem.displacement = *(const int32_t *)(*code);
 		oper->mem.index = REG_RIZ;
 		oper->mem.scale = 0;
-		
+
 		*code = *code + 4;
 
 		if (pfx & REX_B) {
@@ -419,9 +419,9 @@ static int decode_rm_operand(const uint8_t **code, struct operand *oper, X86Inst
 			case 7:	if (pfx & ADDRESS_SIZE_OVERRIDE) oper->mem.base = REG_EDI; else oper->mem.base = REG_RDI; break;
 			}
 		}
-		
+
 		break;
-		
+
 	default: return 0;
 	}
 
@@ -434,7 +434,7 @@ static int decode_mov(X86InstructionPrefixes pfx, const uint8_t **code, struct i
 
 	struct operand *src = &inst->operands[0];
 	struct operand *dst = &inst->operands[1];
-	
+
 	switch (source) {
 	case O_R16_32_64:
 	case O_R8:
@@ -444,7 +444,7 @@ static int decode_mov(X86InstructionPrefixes pfx, const uint8_t **code, struct i
 		if (!decode_rm_operand(code, dst, pfx, modrm.mod, modrm.rm, dest)) return 0;
 		return 1;
 	}
-	
+
 	case O_R_M8:
 	case O_R_M16:
 	case O_R_M16_32_64:
@@ -454,15 +454,15 @@ static int decode_mov(X86InstructionPrefixes pfx, const uint8_t **code, struct i
 		if (!decode_rm_operand(code, src, pfx, modrm.mod, modrm.rm, source)) return 0;
 		return 1;
 	}
-	
+
 	case O_IMM16_32:
 		return 0;
-		
+
 	case O_MOFFS_16_32_64:
 		src->type = OPERAND_MEM_OFF;
 		src->mem_off = *(const uint64_t *)(*code);
 		(*code) += 8;
-		
+
 		if (dest == O_RAX) {
 			dst->type = OPERAND_REGISTER;
 			if (pfx & OPERAND_SIZE_OVERRIDE)
@@ -472,11 +472,20 @@ static int decode_mov(X86InstructionPrefixes pfx, const uint8_t **code, struct i
 		} else {
 			return 0;
 		}
-		
+
 		return 1;
 	default:
 		return 0;
 	}
+}
+
+static int decode_int(X86InstructionPrefixes pfx, const uint8_t **code, struct instruction *inst)
+{
+	inst->opcode = INST_INT;
+	inst->operands[0].type = OPERAND_IMMEDIATE;
+	inst->operands[0].size = 1;
+	inst->operands[0].imm_val = **code;
+	(*code)++;
 }
 
 int decode_instruction(const uint8_t *code, struct instruction *inst)
@@ -502,6 +511,7 @@ int decode_instruction(const uint8_t *code, struct instruction *inst)
 	case 0x8a: if (!decode_mov(p, &code, inst, O_R_M8, O_R8)) return 0; else break;
 	case 0x8b: if (!decode_mov(p, &code, inst, O_R_M16_32_64, O_R16_32_64)) return 0; else break;
 	case 0xc7: if (!decode_mov(p, &code, inst, O_IMM16_32, O_R_M16_32_64)) return 0; else break;
+	case 0xcd: if (!decode_int(p, &code, inst)) return 0; else break;
 	default: return 0;
 	}
 

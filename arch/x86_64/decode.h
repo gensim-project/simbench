@@ -20,12 +20,12 @@ typedef enum {
 	REG_BH,
 	REG_CH,
 	REG_DH,
-	
+
 	REG_SIL,
 	REG_DIL,
 	REG_BPL,
 	REG_SPL,
-	
+
 	REG_AX,
 	REG_BX,
 	REG_CX,
@@ -34,7 +34,7 @@ typedef enum {
 	REG_DI,
 	REG_BP,
 	REG_SP,
-	
+
 	REG_EAX,
 	REG_EBX,
 	REG_ECX,
@@ -85,7 +85,7 @@ typedef enum {
 	REG_R13D,
 	REG_R14D,
 	REG_R15D,
-	
+
 	REG_RIZ
 } X86Register;
 
@@ -93,33 +93,36 @@ struct operand
 {
 	enum operand_type type;
 	int size;
-	
+
 	union
 	{
 		X86Register reg;
-		
+
 		struct {
 			int displacement;
 			X86Register base;
-			
+
 			int scale;
 			X86Register index;
 		} mem;
-		
+
 		uint64_t mem_off;
+
+		uint64_t imm_val;
 	};
 };
 
 enum opcode
 {
 	INST_MOV,
+	INST_INT,
 };
 
 struct instruction
 {
 	enum opcode opcode;
 	int length;
-	
+
 	struct operand operands[2];
 };
 
