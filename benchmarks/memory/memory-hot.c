@@ -40,6 +40,7 @@ static void kernel_control()
 	
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
+		asm volatile ("");
 	}
 }
 
