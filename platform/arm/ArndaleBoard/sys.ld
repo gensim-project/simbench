@@ -20,7 +20,7 @@ SECTIONS
 
 	_TEXT_END = .;
 
-	. = ALIGN(4k)
+	. = ALIGN(4k);
 
 	_DATA_START = .;
 
