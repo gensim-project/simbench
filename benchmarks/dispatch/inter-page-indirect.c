@@ -1,6 +1,5 @@
 #include "benchmark.h"
 #include "debug.h"
-#include "harness.h"
 
 #define DISPATCH_ITERATIONS 100
 
@@ -47,10 +46,9 @@ static void kernel()
 	}
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(inter_page_indirect) = {
 	.name="Inter-Page-Indirect",
 	.category="Dispatch",
 	.kernel=kernel,
 	.iteration_count = DISPATCH_ITERATIONS * BENCHMARK_ITERATIONS
 };
-REG_BENCHMARK(bmark);

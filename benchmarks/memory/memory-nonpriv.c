@@ -1,6 +1,5 @@
 #include "benchmark.h"
 #include "debug.h"
-#include "harness.h"
 #include "mem.h"
 #include "arch.h"
 
@@ -36,7 +35,7 @@ static void kernel_mmu_cleanup()
 	mem_reset();
 }
 
-static benchmark_t bmark_mmu = {
+DEFINE_BENCHMARK(memory_nonpriv) = {
 	.name="Memory-NonPriv",
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
@@ -44,5 +43,3 @@ static benchmark_t bmark_mmu = {
 	.kernel_cleanup=kernel_mmu_cleanup,
 	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
-
-REG_BENCHMARK(bmark_mmu);

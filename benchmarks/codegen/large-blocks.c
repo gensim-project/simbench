@@ -1,7 +1,6 @@
 #include "arch.h"
 #include "benchmark.h"
 #include "debug.h"
-#include "harness.h"
 
 #include "define.h"
 
@@ -110,11 +109,10 @@ static void ALIGN kernel_control()
 	}
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(large_blocks) = {
 	.name="Large-Blocks",
 	.category="Codegen",
 	.kernel=kernel,
 	.kernel_control=kernel_control,
 	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS
 };
-REG_BENCHMARK(bmark);

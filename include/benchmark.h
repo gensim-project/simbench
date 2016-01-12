@@ -20,4 +20,6 @@ typedef struct {
 	uint64_t iteration_count;
 } benchmark_t;
 
+#define DEFINE_BENCHMARK(__name) const benchmark_t __attribute__((section(".benchmarks"))) __attribute__((aligned(__alignof__(unsigned long))))  __benchmark_##__name
+
 #endif

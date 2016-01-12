@@ -1,6 +1,5 @@
 #include "benchmark.h"
 #include "debug.h"
-#include "harness.h"
 
 #define NOREORDER 
 //#define NOREORDER __attribute__((no_reorder))
@@ -52,10 +51,9 @@ static void kernel()
 	}
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(intra_page_indirect) = {
 	.name="Same-Page-Indirect",
 	.category="Dispatch",
 	.kernel=kernel,
 	.iteration_count = DISPATCH_ITERATIONS * BENCHMARK_ITERATIONS
 };
-REG_BENCHMARK(bmark);

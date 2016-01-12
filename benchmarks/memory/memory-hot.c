@@ -1,6 +1,5 @@
 #include "benchmark.h"
 #include "debug.h"
-#include "harness.h"
 #include "mem.h"
 
 #define MEMORY_BENCHMARK_ITERATIONS 200000
@@ -57,7 +56,7 @@ static void kernel_mmu_cleanup()
 	mem_reset();
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(memory_hot_nommu) = {
 	.name="Memory-Hot-NoMMU",
 	.category="Memory",
 	.kernel=kernel,
@@ -65,7 +64,7 @@ static benchmark_t bmark = {
 	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
 
-static benchmark_t bmark_mmu = {
+DEFINE_BENCHMARK(memory_hot_mmu) = {
 	.name="Memory-Hot-MMU",
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
@@ -74,6 +73,3 @@ static benchmark_t bmark_mmu = {
 	.kernel_cleanup=kernel_mmu_cleanup,
 	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
-
-REG_BENCHMARK(bmark);
-REG_BENCHMARK(bmark_mmu);

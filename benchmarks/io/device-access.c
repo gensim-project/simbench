@@ -1,7 +1,6 @@
 #include "arch.h"
 #include "benchmark.h"
 #include "debug.h"
-#include "harness.h"
 #include "mem.h"
 #include "platform.h"
 
@@ -23,11 +22,9 @@ static void ALIGN kernel()
 	}
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(device_access) = {
 	.name="Device-Access",
 	.category="IO",
 	.kernel=kernel,
 	.iteration_count = BENCHMARK_ITERATIONS * IO_BENCHMARK_ITERATIONS
 };
-
-REG_BENCHMARK(bmark);

@@ -27,24 +27,33 @@ SECTIONS
 	_TEXT_END = .;
 
 	. = 0x00100000;
+
 	_DATA_START = .;
-	.data : 
+
+	.rodata : ALIGN(4k)
+	{ 
+		*(.rodata) 
+	}
+
+	.data : ALIGN(4k)
 	{ 
 		*(.data) 
-		SORT(CONSTRUCTORS)
 	}
-	
-	.init_array : 
+
+	.benchmarks : ALIGN(4k)
 	{
-		_CTORS_START = .;
-		KEEP(*(.init_array));
-		_CTORS_END = .;
+		. = ALIGN(8);
+		_BENCHMARKS_START = .;
+		KEEP(*(.benchmarks));
+		_BENCHMARKS_END = .;
 	}
 	
-	.bss : 
+	.bss : ALIGN(4k)
 	{ 
+		*(COMMON)
 		*(.bss) 
 	}
+
 	_DATA_END = .;
 
 }

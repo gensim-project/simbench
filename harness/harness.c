@@ -1,46 +1,14 @@
 #include "uart.h"
 #include "harness.h"
+#include "benchmark.h"
 
-#define MAX_BENCHMARKS 100
-
-typedef void (*ctor_t)();
-extern intptr_t _CTORS_START, _CTORS_END;
-
-static int num_benchmarks;
-static benchmark_t *benchmarks[MAX_BENCHMARKS];
+extern const benchmark_t _BENCHMARKS_START[], _BENCHMARKS_END[];
 
 void harness_init()
 {
-	num_benchmarks = 0;
-	
-	intptr_t *ctor_ptr;
-
-	for(ctor_ptr=&_CTORS_START; ctor_ptr != &_CTORS_END; ctor_ptr++)
-	{
-		ctor_t ctor = (ctor_t)*ctor_ptr;
-		ctor();
-	}	
 }
 
-void harness_main()
-{	
-	int i = 0;
-	
-	uart_puts("\\\\BENCHMARKS BEGIN\r\n");
-	
-	for(i = 0; i < num_benchmarks; ++i) {
-		harness_execute(benchmarks[i]);
-	}
-	
-	uart_puts("\\\\BENCHMARKS END\r\n");
-}
-
-void harness_register_benchmark(benchmark_t *benchmark)
-{
-	benchmarks[num_benchmarks++] = benchmark;
-}
-
-void harness_execute(benchmark_t *benchmark)
+static void harness_execute(const benchmark_t *benchmark)
 {
 	uart_puts(benchmark->category);
 	uart_puts(" - ");
@@ -62,4 +30,17 @@ void harness_execute(benchmark_t *benchmark)
 	uart_puts("]\r\n");
 	
 	if(benchmark->kernel_cleanup) benchmark->kernel_cleanup();
+}
+
+void harness_main()
+{	
+	const benchmark_t *benchmark;
+	
+	uart_puts("\\\\BENCHMARKS BEGIN\r\n");
+	
+	for (benchmark = &_BENCHMARKS_START[0]; benchmark < _BENCHMARKS_END; benchmark++) {
+		harness_execute(benchmark);
+	}
+	
+	uart_puts("\\\\BENCHMARKS END\r\n");
 }

@@ -1,7 +1,6 @@
 #include "arch.h"
 #include "benchmark.h"
 #include "debug.h"
-#include "harness.h"
 #include "mem.h"
 
 #define EXCEPTION_BENCHMARK_ITERATIONS 5000
@@ -37,7 +36,7 @@ static void kernel_cleanup()
 	mem_reset();
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(ifault) = {
 	.name="Instruction-Fault",
 	.category="Exception",
 	.kernel_init=kernel_init,
@@ -45,5 +44,3 @@ static benchmark_t bmark = {
 	.kernel_cleanup=kernel_cleanup,
 	.iteration_count = EXCEPTION_BENCHMARK_ITERATIONS * BENCHMARK_ITERATIONS
 };
-
-REG_BENCHMARK(bmark);

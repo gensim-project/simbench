@@ -71,7 +71,7 @@ static void kernel_mmu_cleanup()
 	mem_reset();
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(memory_cold_nommu) = {
 	.name="Memory-Cold-NoMMU",
 	.category="Memory",
 	.kernel=kernel,
@@ -79,7 +79,7 @@ static benchmark_t bmark = {
 	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS,
 };
 
-static benchmark_t bmark_mmu = {
+DEFINE_BENCHMARK(memory_cold_mmu) = {
 	.name="Memory-Cold-MMU",
 	.category="Memory",
 	.kernel_init=kernel_mmu_init,
@@ -88,6 +88,3 @@ static benchmark_t bmark_mmu = {
 	.kernel_cleanup=kernel_mmu_cleanup,
 	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
 };
-
-REG_BENCHMARK(bmark);
-REG_BENCHMARK(bmark_mmu);

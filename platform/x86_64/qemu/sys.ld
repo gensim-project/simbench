@@ -6,31 +6,40 @@ SECTIONS
 	{ 
 		_TEXT_START = .;
 		KEEP(*(.bootstrap))
-		*(.text) 		
-		KEEP (*(SORT(.ctors.*)))
-		KEEP (*(.ctors))
+		*(.text)
+		*(.text.*)
 	}
 
 	_TEXT_END = .;
 
+	. = ALIGN(4k);
+
+	_DATA_START = .;
+
+	.rodata : ALIGN(4k)
+	{
+		*(.rodata)
+	}
+
 	.data : ALIGN(4k)
 	{ 
-		_DATA_START = .;
-		*(.data) 
-		SORT(CONSTRUCTORS)
+		*(.data)
 	}
 	
-	.init_array : 
+	.benchmarks : ALIGN(4k)
 	{
-		_CTORS_START = .;
-		KEEP(*(.init_array));
-		_CTORS_END = .;
+		. = ALIGN(8);
+		_BENCHMARKS_START = .;
+		KEEP(*(.benchmarks));
+		_BENCHMARKS_END = .;
+	}
+
+	.bss : ALIGN(4k)
+	{
+		*(COMMON)
+		*(.bss)
 	}
 	
-	.bss : 
-	{ 
-		*(.bss) 
-	}
 	_DATA_END = .;
 
 	. = ALIGN(4k);

@@ -1,7 +1,6 @@
 #include "arch.h"
 #include "debug.h"
 #include "benchmark.h"
-#include "harness.h"
 
 #define CODEGEN_ITERATIONS 100
 
@@ -86,7 +85,7 @@ static void ALIGN kernel_control()
 	}
 }
 
-static benchmark_t bmark = {
+DEFINE_BENCHMARK(small_blocks) = {
 	.name="Small-Blocks",
 	.category="Codegen",
 	.kernel_init=kernel_init,
@@ -94,4 +93,4 @@ static benchmark_t bmark = {
 	.kernel_control=kernel_control,
 	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS
 };
-REG_BENCHMARK(bmark);
+
