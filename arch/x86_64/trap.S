@@ -87,12 +87,22 @@ trap_page_fault:
 
 	exit_intr
 
-.extern itw_handler_fn
+.extern irq_handler_fn
 .globl trap_irq
 trap_irq:
 	enter_intr 0
 
 	lea irq_handler_fn, %rcx
+	call *(%rcx)
+
+	exit_intr
+
+.extern undef_handler_fn
+.globl trap_undef
+trap_undef:
+	enter_intr 0
+
+	lea undef_handler_fn, %rcx
 	call *(%rcx)
 
 	exit_intr

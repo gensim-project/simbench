@@ -22,10 +22,12 @@ extern void trap_unknown_arg(struct mcontext *);
 extern void trap_page_fault(struct mcontext *);
 extern void trap_syscall(struct mcontext *);
 extern void trap_irq(struct mcontext *);
+extern void trap_undef(struct mcontext *);
 
 syscall_handler_fn_t syscall_handler_fn;
 page_fault_handler_fn_t page_fault_handler_fn;
 irq_handler_fn_t irq_handler_fn;
+undef_handler_fn_t undef_handler_fn;
 
 static void default_syscall_handler(struct mcontext *ctx)
 {
@@ -42,6 +44,12 @@ static void default_page_fault_handler(struct mcontext *mcontext, uint64_t va)
 static void default_irq_handler(struct mcontext *mcontext)
 {
 	fprintf(ERROR, "x86: unhandled irq: rip=%p\n", mcontext->rip);
+	arch_abort();
+}
+
+static void default_undef_handler(struct mcontext *mcontext)
+{
+	fprintf(ERROR, "x86: undefined instruction: rip=%p\n", mcontext->rip);
 	arch_abort();
 }
 
@@ -120,6 +128,7 @@ void irq_init()
 		set_idt(&idt[i], trap_unknown, 0);
 	}
 
+	set_idt(&idt[0x06], trap_undef, 0);
 	set_idt(&idt[0x08], trap_unknown_arg, 0);
 	set_idt(&idt[0x08], trap_unknown_arg, 0);
 	set_idt(&idt[0x0a], trap_unknown_arg, 0);
@@ -139,6 +148,7 @@ void irq_init()
 	irq_reset_syscall_handler();
 	irq_reset_page_fault_handler();
 	irq_reset_irq_handler();
+	irq_reset_undef_handler();
 }
 
 void irq_install_syscall_handler(syscall_handler_fn_t handler_fn)
@@ -156,6 +166,11 @@ void irq_install_irq_handler(irq_handler_fn_t handler_fn)
 	irq_handler_fn = handler_fn;
 }
 
+void irq_install_undef_handler(undef_handler_fn_t handler_fn)
+{
+	undef_handler_fn = handler_fn;
+}
+
 void irq_reset_syscall_handler()
 {
 	syscall_handler_fn = default_syscall_handler;
@@ -169,6 +184,11 @@ void irq_reset_page_fault_handler()
 void irq_reset_irq_handler()
 {
 	irq_handler_fn = default_irq_handler;
+}
+
+void irq_reset_undef_handler()
+{
+	undef_handler_fn = default_undef_handler;
 }
 
 void handle_trap_unknown(struct mcontext *mcontext)

@@ -57,12 +57,22 @@ void arch_syscall_install_skip()
 	irq_install_syscall_handler(syscall_skip_handler);
 }
 
+static void undef_skip_handler(struct mcontext *ctx)
+{
+	ctx->rip += 2;
+}
+
 void arch_undef_install_skip()
 {
-	arch_abort();
+	irq_install_undef_handler(undef_skip_handler);
 }
 
 void arch_syscall()
 {
 	asm volatile("int $0x80\n");
+}
+
+void arch_undefined_instruction()
+{
+	asm volatile("ud2\n");
 }

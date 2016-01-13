@@ -80,9 +80,3 @@ void arch_irq_install_handler(irq_handler_t handler)
 	else
 		irq_reset_irq_handler();
 }
-
-
-void arch_undefined_instruction()
-{
-	arch_abort();
-}
