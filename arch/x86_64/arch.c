@@ -2,6 +2,7 @@
 #include "platform.h"
 #include "harness.h"
 #include "debug.h"
+#include "printf.h"
 #include "irq.h"
 #include "heap.h"
 
@@ -13,7 +14,7 @@ void arch_init()
 
 void arch_abort()
 {
-	dprintf("x86-64: abort!\n");
+	fprintf(ERROR, "x86-64: abort!\n");
 	for (;;) asm volatile("hlt\n");
 }
 
@@ -46,5 +47,5 @@ void arch_start(unsigned int magic, void *mb_info)
 
 void arch_coprocessor_access()
 {
-	arch_abort();
+	asm volatile("outb %0, $0xf1\n" :: "a"((char)0));
 }

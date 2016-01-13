@@ -2,6 +2,7 @@
 #include "x86.h"
 #include "arch.h"
 #include "debug.h"
+#include "printf.h"
 #include "heap.h"
 
 struct IDT {
@@ -26,13 +27,13 @@ page_fault_handler_fn_t page_fault_handler_fn;
 
 static void default_syscall_handler(struct mcontext *ctx)
 {
-	dprintf("x86: unhandled syscall: rip=%p\n", ctx->rip);
+	fprintf(ERROR, "x86: unhandled syscall: rip=%p\n", ctx->rip);
 	arch_abort();
 }
 
 static void default_page_fault_handler(struct mcontext *mcontext, uint64_t va)
 {
-	dprintf("x86: unhandled page-fault: code=%lx, rip=%p, va=%p\n", mcontext->extra, mcontext->rip, va);
+	fprintf(ERROR, "x86: unhandled page-fault: code=%lx, rip=%p, va=%p\n", mcontext->extra, mcontext->rip, va);
 	arch_abort();
 }
 
@@ -107,12 +108,12 @@ void irq_reset_page_fault_handler()
 
 void handle_trap_unknown(struct mcontext *mcontext)
 {
-	dprintf("unknown exception from rip=%lx\n", mcontext->rip);
+	fprintf(ERROR, "unknown exception from rip=%lx\n", mcontext->rip);
 	arch_abort();
 }
 
 void handle_trap_unknown_arg(struct mcontext *mcontext, uint64_t val)
 {
-	dprintf("unknown exception from rip=%lx, val=%lx\n", mcontext->rip, val);
+	fprintf(ERROR, "unknown exception from rip=%lx, val=%lx\n", mcontext->rip, val);
 	arch_abort();
 }
