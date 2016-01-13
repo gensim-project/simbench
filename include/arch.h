@@ -14,10 +14,13 @@ extern void arch_ifault_install_break();
 
 extern void arch_dfault_install_skip();
 
+extern void arch_undef_install_skip();
+
 extern void arch_syscall_install_skip();
 extern void arch_syscall();
 
 extern void arch_coprocessor_access();
+extern void arch_undefined_instruction();
 
 extern void arch_irq_enable();
 extern void arch_irq_disable();
