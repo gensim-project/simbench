@@ -49,9 +49,7 @@ void mem_init()
 	
 	irq_reset_page_fault_handler();
 	
-	initial_pagetables = (uintptr_t)0xb000;
-	runtime_pagetables = (uintptr_t)heap_alloc_page();
-	
+	runtime_pagetables = (uintptr_t)heap_alloc_page();	
 	prepare_runtime_pagetables();
 }
 
@@ -195,5 +193,6 @@ int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 
 void early_mem_init()
 {
-	__create_page_mapping(0xb000, (uintptr_t)LAPIC, (uintptr_t)LAPIC);
+	initial_pagetables = (uintptr_t)0xb000;
+	__create_page_mapping(initial_pagetables, (uintptr_t)LAPIC, (uintptr_t)LAPIC);
 }
