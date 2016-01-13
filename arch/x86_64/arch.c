@@ -6,8 +6,12 @@
 #include "irq.h"
 #include "heap.h"
 
+extern void early_mem_init();
+
 void arch_init()
 {
+	early_mem_init();
+	
 	heap_init();
 	irq_init();
 }
@@ -48,4 +52,31 @@ void arch_start(unsigned int magic, void *mb_info)
 void arch_coprocessor_access()
 {
 	asm volatile("outb %0, $0xf1\n" :: "a"((char)0));
+}
+
+void arch_irq_enable()
+{
+	asm volatile("sti\n");
+}
+
+void arch_irq_disable()
+{
+	asm volatile("cli\n");
+}
+
+static irq_handler_t benchmark_irq_handler;
+
+static void arch_irq_handler(struct mcontext *ctx)
+{
+	if (benchmark_irq_handler) benchmark_irq_handler();
+}
+
+void arch_irq_install_handler(irq_handler_t handler)
+{
+	benchmark_irq_handler = handler;
+	
+	if (handler)
+		irq_install_irq_handler(arch_irq_handler);
+	else
+		irq_reset_irq_handler();
 }

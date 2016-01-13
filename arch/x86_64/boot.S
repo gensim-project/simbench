@@ -115,6 +115,7 @@ build_pagetables:
 	pop %edi
 #endif
 
+	// Insert 1GiB page entry into PDP[0]
 	mov $0x83, %eax
 	mov %eax, 0x1000(%edi)
 
@@ -131,7 +132,7 @@ pt2mb:
 
 	// PDPT
 	lea 0x2000(%edi), %eax
-	or $3, %eax
+	or $0x3, %eax
 	mov %eax, 0x1000(%edi)
 
 	// PDP - Map a bunch of 2MiB pages
@@ -145,7 +146,7 @@ pt2mb:
 	incl %ecx
 	cmp $0x200, %ecx
 	jne 1b
-	
+
 	ret
 
 #ifdef DEBUG_BOOT

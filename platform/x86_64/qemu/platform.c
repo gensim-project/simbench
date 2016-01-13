@@ -1,6 +1,11 @@
 #include "platform.h"
 #include "printf.h"
 #include "console.h"
+#include "arch.h"
+#include "debug.h"
+
+extern void lapic_issue_interrupt(int irq);
+extern void lapic_acknowledge_irq(void);
 
 static void qemu_output_putc(char ch)
 {
@@ -39,10 +44,10 @@ uint32_t platform_get_null_devval()
 
 void platform_trigger_swi()
 {
-
+	lapic_issue_interrupt(0x30);
 }
 
 void platform_clear_swi()
 {
-
+	lapic_acknowledge_irq();
 }

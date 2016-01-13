@@ -61,18 +61,3 @@ void arch_syscall()
 {
 	asm volatile("int $0x80\n");
 }
-
-void arch_irq_enable()
-{
-	arch_abort();
-}
-
-void arch_irq_disable()
-{
-	arch_abort();
-}
-
-void arch_irq_install_handler(irq_handler_t handler)
-{
-	arch_abort();
-}
