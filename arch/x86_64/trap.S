@@ -86,3 +86,13 @@ trap_page_fault:
 	call *(%rcx)
 
 	exit_intr
+
+.extern itw_handler_fn
+.globl trap_irq
+trap_irq:
+	enter_intr 0
+
+	lea irq_handler_fn, %rcx
+	call *(%rcx)
+
+	exit_intr

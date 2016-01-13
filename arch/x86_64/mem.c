@@ -35,9 +35,10 @@ static void prepare_runtime_pagetables()
 	
 	// Map the heap
 	map_page_ranges(PAGE_ADDR(_HEAP_START), PAGE_ADDR(_HEAP_START), ((uintptr_t)&_HEAP_SIZE) >> 12);
+	
+	// Map the LAPIC
+	mem_create_page_mapping((uintptr_t)LAPIC, (uintptr_t)LAPIC);
 }
-
-
 
 static int mem_inited;
 
@@ -48,9 +49,7 @@ void mem_init()
 	
 	irq_reset_page_fault_handler();
 	
-	initial_pagetables = (uintptr_t)0xb000;
-	runtime_pagetables = (uintptr_t)heap_alloc_page();
-
+	runtime_pagetables = (uintptr_t)heap_alloc_page();	
 	prepare_runtime_pagetables();
 }
 
@@ -146,11 +145,11 @@ static inline table_indicies calculate_indicies(uintptr_t virt_addr)
 	return ret;
 }
 
-int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
+static int __create_page_mapping(uintptr_t pml4, uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	table_indicies idx = calculate_indicies(virt_addr);
 	
-	pte *pml = &((pte *)runtime_pagetables)[idx.pml];
+	pte *pml = &((pte *)pml4)[idx.pml];
 	if (!is_present(pml)) {
 		if (get_base_address(pml) == 0) {
 			set_base_address(pml, (uintptr_t)heap_alloc_page());
@@ -182,7 +181,18 @@ int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 	set_flags(pt, PF_PRESENT | PF_WRITABLE | PF_USER);
 }
 
+int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
+{
+	__create_page_mapping(runtime_pagetables, phys_addr, virt_addr);
+}
+
 int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	arch_abort();
+}
+
+void early_mem_init()
+{
+	initial_pagetables = (uintptr_t)0xb000;
+	__create_page_mapping(initial_pagetables, (uintptr_t)LAPIC, (uintptr_t)LAPIC);
 }
