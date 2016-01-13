@@ -32,6 +32,9 @@ dabt_skip:
 swi_skip:
 	bx lr
 
+.globl undef_skip
+undef_skip:
+	movs pc, lr
 
 .globl irq_handler_tramp
 irq_handler_tramp:

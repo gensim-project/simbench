@@ -5,9 +5,11 @@ extern uint32_t _VECTORS_RELOCATE;
 extern uint32_t pabt_handler;
 extern uint32_t dabt_handler;
 extern uint32_t swi_handler;
+extern uint32_t undef_handler;
 extern void pabt_return();
 extern void dabt_skip();
 extern void swi_skip();
+extern void undef_skip();
 extern void default_handler();
 
 // The vectors have been copied into the low page so need to do some address calculation
@@ -25,6 +27,11 @@ static void install_swi(uint32_t swi_location)
 {
 	uint32_t vector_location = ((uint32_t)&swi_handler - (uint32_t)&vectors_start) + (uint32_t)&_VECTORS_RELOCATE;
 	*(uint32_t*)vector_location = swi_location;
+}
+static void install_undef(uint32_t undef_location)
+{
+	uint32_t vector_location = ((uint32_t)&undef_handler - (uint32_t)&vectors_start) + (uint32_t)&_VECTORS_RELOCATE;
+	*(uint32_t*)vector_location = undef_location;
 }
 
 void arch_ifault_install_return()
@@ -45,6 +52,11 @@ void arch_dfault_install_skip()
 void arch_syscall_install_skip()
 {
 	install_swi((uint32_t)swi_skip);
+}
+
+void arch_undef_install_skip()
+{
+	install_undef((uint32_t)undef_skip);
 }
 
 #define MODE_IRQ_DISABLE (1 << 7) 

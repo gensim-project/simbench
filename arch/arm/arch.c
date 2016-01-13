@@ -41,9 +41,8 @@ uint32_t arch_nonpriviliged_read(volatile uint32_t *ptr)
 
 void arch_undefined_instruction()
 {
-	asm(".word 0xe7ffffff\n");
+	asm(".word 0xe7f000f0\n");
 }
-
 
 void arch_syscall()
 {
@@ -52,6 +51,7 @@ void arch_syscall()
 
 void arch_coprocessor_access()
 {
-	
+	uint32_t data;
+	asm volatile ("mrc p15, 2, %0, c1, c0, 0\n" : "=r"(data));
 }
 
