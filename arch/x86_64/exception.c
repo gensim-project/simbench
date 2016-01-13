@@ -57,6 +57,11 @@ void arch_syscall_install_skip()
 	irq_install_syscall_handler(syscall_skip_handler);
 }
 
+void arch_undef_install_skip()
+{
+	arch_abort();
+}
+
 void arch_syscall()
 {
 	asm volatile("int $0x80\n");

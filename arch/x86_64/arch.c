@@ -48,3 +48,8 @@ void arch_coprocessor_access()
 {
 	arch_abort();
 }
+
+void arch_undefined_instruction()
+{
+	arch_abort();
+}
