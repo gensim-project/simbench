@@ -11,7 +11,7 @@ pabt_return:
 	
 	mrs r0, CPSR
 	bic lr, r0, #0xf
-	orr lr, #0x3
+	orr lr, #0xf
 	msr CPSR, lr
 	mov r1, lr
 	msr CPSR, r0
@@ -30,7 +30,7 @@ dabt_skip:
 
 .globl swi_skip
 swi_skip:
-	bx lr
+	movs pc, lr
 
 .globl undef_skip
 undef_skip:

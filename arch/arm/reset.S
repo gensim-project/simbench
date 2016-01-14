@@ -37,6 +37,7 @@ setup_stacks:
 	ldr r0, =stack_top
 	str r0, [r0]
 	ldm r0, {sp}^
+	mov r2, lr
 	
 	//Set up stack for IRQ mode
 	mov r0, #0x12
@@ -48,13 +49,15 @@ setup_stacks:
 	msr cpsr_c, r0
 	ldr sp, =pabt_stack_top
 	
-	//restore old mode
+	//Set up stack for SWI mode
 	msr cpsr_c, r1
-	
-	//set up swi stack
 	ldr sp, =swi_stack_top
 	
-	bx lr
+	//Switch in to SYS mode
+	orr r1, #0xf
+	msr cpsr_c, r1
+	
+	bx r2
 .size setup_stacks,.-setup_stacks
 
 
