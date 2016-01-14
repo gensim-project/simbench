@@ -72,26 +72,75 @@ static int mem_create_region_device_mapping(uintptr_t region_start, uintptr_t re
 	return 0;
 }
 
+static uint8_t mem_get_arm_arch_version()
+{
+	// details here from ARMv5 architecture reference manual (DDI 0100I)
+	
+	uint32_t ctrl;
+	// get CPUID
+	asm("mrc p15, 0, %0, cr0, cr0, 0" : "=r"(ctrl));
+	
+	// if bit 19 is 0, we have <= ARMv4
+	if(!(ctrl & (1 << 19))) {
+		// if bit 23 is 0, we have ARMv3
+		if(!(ctrl & (1 << 23))) return 3;
+		
+		// otherwise, ARMv4
+		return 4;
+	}
+	
+	//extract the architecture field
+	ctrl >>= 16;
+	ctrl &= 0xf;
+	
+	switch(ctrl) {
+		case 1: 
+		case 2:
+			return 4;
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+			return 5;
+		case 7:
+			return 6;
+	}
+	
+	// Unknown version
+	return 0;
+}
+
 static void mem_check_is_tlb_unified()
 {
 	uint32_t ctrl;
-	asm("mrc p15, 0, %0, cr0, cr0, 3" : "=r"(ctrl) ::);
-	if(ctrl & 1) mem_tlb_unified = 0;
-	else mem_tlb_unified = 1;
+	// TLB type register only exists since ARMv5
+	if(mem_get_arm_arch_version() < 5) {
+		mem_tlb_unified = 0;
+	} else {
+		asm("mrc p15, 0, %0, cr0, cr0, 3" : "=r"(ctrl) ::);
+		if(ctrl & 1) mem_tlb_unified = 0;
+		else mem_tlb_unified = 1;
+	}
 }
 
 static void mem_check_is_cache_unified()
 {
 	uint32_t ctrl;
-	asm("mrc p15, 0, %0, cr0, cr0, 1" : "=r"(ctrl) ::);
 	
-	uint32_t cache_size = ctrl & 0xfff;
-	if(((cache_size >> 2) & 0xf) == 0x1) mem_cache_implemented = 0;
-	else mem_cache_implemented = 1;
-	
-	ctrl = (ctrl >> 24) & 1;
-	if(ctrl) mem_cache_unified = 0;
-	else mem_cache_unified = 1;
+	// cache type register only exists since ARMv5
+	if(mem_get_arm_arch_version() < 5) {
+		mem_cache_unified = 0;
+	} else {
+		asm("mrc p15, 0, %0, cr0, cr0, 1" : "=r"(ctrl) ::);
+		
+		uint32_t cache_size = ctrl & 0xfff;
+		if(((cache_size >> 2) & 0xf) == 0x1) mem_cache_implemented = 0;
+		else mem_cache_implemented = 1;
+		
+		ctrl = (ctrl >> 24) & 1;
+		if(ctrl) mem_cache_unified = 0;
+		else mem_cache_unified = 1;
+	}
 }
 
 void mem_init()
