@@ -51,7 +51,8 @@ void arch_syscall()
 
 void arch_coprocessor_access()
 {
+	// read the DACR
 	uint32_t data;
-	asm volatile ("mrc p15, 2, %0, c1, c0, 0\n" : "=r"(data));
+	asm volatile("mrc p15, 0, %0, cr3, cr0, 0" : "=r"(data) :);
 }
 
