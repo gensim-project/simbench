@@ -41,10 +41,11 @@ irq_handler_tramp:
 	push {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,lr}
 	
 	ldr r0, arch_irq_handler
-	blx r0
+	mov lr, pc
+	mov pc, r0
 	
 	pop {r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,lr}
-	movs pc, lr
+	subs pc, lr, #4
 
 .globl arch_irq_handler
 arch_irq_handler:
