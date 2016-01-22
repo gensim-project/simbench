@@ -18,7 +18,7 @@ struct uart_regs_t
 	volatile uint32_t urxh;
 	volatile uint32_t ubrdiv;
 	volatile uint32_t ufracval;
-        volatile uint32_t uintp;
+	volatile uint32_t uintp;
 	volatile uint32_t uints;
 	volatile uint32_t uintm;
 };

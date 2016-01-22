@@ -14,6 +14,12 @@
 
   *** ** ** * * * ** *  * ** * * * * * * * * * * */
 
+#define GPIO_BASE      (0x11400000)
+#define GPY6CON_ADDR   (GPIO_BASE + 0x0260)
+#define GPY6DAT_ADDR   (GPIO_BASE + 0x0264)
+#define GPY6PUD_ADDR   (GPIO_BASE + 0x0268)
+#define GPY6DRV_ADDR   (GPIO_BASE + 0x026C)
+
 #define LEDS_ADDR      0x11400260
 #define LEDS_VAL       0xFFFFFFFF
 
@@ -23,5 +29,8 @@
 #define TTY_UART_BASE         0x12C20000
 #define TTY_UART_MEM_START    0x12C20000
 #define TTY_UART_MEM_END      0x12C2FFFF
+
+#define GIC_MEM_START         0x10481000
+#define GIC_MEM_END           0x10489000
 
 #endif
