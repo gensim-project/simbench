@@ -59,10 +59,31 @@ finished:
 	pop {r4-r7, r9-r11}
 	bx lr
 
+.extern mem_cache_flush
+.globl mem_armv5_cache_mmu_off
+mem_armv5_cache_mmu_off:
+	mcr p15, 0, r0, c7, c10, 4 // DSB
+	mcr p15, 0, r0, c7, c5, 4 // ISB
+		
+	// Disable the MMU, D$, Write buffer
+	mrc p15, 0, r0, c1, c0 
+	bic r0, r0, #0xd
+	mcr p15, 0, r0, c1, c0 
+	
+	// Flush the caches
+	mov r0, #0
+	mcr p15, 0, r0, cr7, cr14, 0
+	
+	mcr p15, 0, r0, c8, c7, 0 // TLB Flush
+	mcr p15, 0, r0, c7, c5, 6 // BTB flush
+	mcr p15, 0, r0, c7, c10, 4 // DSB
+	mcr p15, 0, r0, c7, c5, 4 // ISB
+	mov pc, lr
+
 
 .extern mem_cache_flush
-.globl mem_arm_cache_mmu_off
-mem_arm_cache_mmu_off:
+.globl mem_armv7_cache_mmu_off
+mem_armv7_cache_mmu_off:
 
 	dmb
 	dsb

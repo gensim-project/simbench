@@ -258,11 +258,17 @@ void mem_mmu_enable()
 	mem_cache_flush();
 }
 
-extern void mem_arm_cache_mmu_off();
+extern void mem_armv5_cache_mmu_off();
+extern void mem_armv7_cache_mmu_off();
 void mem_mmu_disable()
 {
-	//fprintf(DEBUG, "Disabling MMU\r\n");
-	mem_arm_cache_mmu_off();
+	switch(mem_get_arm_arch_version()) {
+		case 7:
+			mem_armv7_cache_mmu_off();
+			break;
+		default:
+			mem_armv5_cache_mmu_off();
+	}
 }
 
 void mem_tlb_flush()
@@ -380,3 +386,4 @@ int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 	
 	return 0;
 }
+
