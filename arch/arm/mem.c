@@ -104,6 +104,9 @@ static uint8_t mem_get_arm_arch_version()
 			return 5;
 		case 7:
 			return 6;
+		case 0xF:
+			// Not strictly true
+			return 7;
 	}
 	
 	// Unknown version
@@ -128,25 +131,34 @@ static void mem_check_is_cache_unified()
 	uint32_t ctrl;
 	
 	// cache type register only exists since ARMv5
-	if(mem_get_arm_arch_version() < 5) {
-		mem_cache_unified = 0;
-	} else {
-		asm("mrc p15, 0, %0, cr0, cr0, 1" : "=r"(ctrl) ::);
-		
-		uint32_t cache_size = ctrl & 0xfff;
-		if(((cache_size >> 2) & 0xf) == 0x1) mem_cache_implemented = 0;
-		else mem_cache_implemented = 1;
-		
-		ctrl = (ctrl >> 24) & 1;
-		if(ctrl) mem_cache_unified = 0;
-		else mem_cache_unified = 1;
+	switch(mem_get_arm_arch_version()) {
+		case 0 ... 4:
+			//fprintf(DEBUG, "Cache not unified\r\n");
+			mem_cache_unified = 0;
+			break;
+		case 5 ... 6: {
+			asm("mrc p15, 0, %0, cr0, cr0, 1" : "=r"(ctrl) ::);
+			//fprintf(DEBUG, "Cache type register %08x\n", ctrl);
+			
+			uint32_t cache_size = ctrl & 0xfff;
+			if(((cache_size >> 2) & 0xf) == 0x1) mem_cache_implemented = 0;
+			else mem_cache_implemented = 1;
+			
+			ctrl = (ctrl >> 24) & 1;
+			if(ctrl) mem_cache_unified = 0;
+			else mem_cache_unified = 1;
+			break;
+		}
+		case 7:
+			// assume a cache - it'll be handled by the cache cleaning ops
+			//fprintf(DEBUG, "We have an ARMv7-style cache\r\n");
+			mem_cache_implemented = 1;
+			break;
 	}
 }
 
 void mem_init()
-{
-	if(mem_inited) return;
-	
+{	
 	mem_check_is_tlb_unified();
 	mem_check_is_cache_unified();
 	
@@ -216,8 +228,11 @@ void mem_init()
 	
 	mem_dprintf("Writing DACR\r\n");
 	write_dacr(0xffffffff);
+	mem_dprintf("Wrote DACR\r\n");
 	
 	mem_inited = 1;
+	
+	mem_dprintf("Done initialising memory\r\n");
 }
 
 void mem_reset()
@@ -229,26 +244,31 @@ void mem_reset()
 void mem_mmu_enable()
 {
 	uint32_t c;
-	asm("mrc p15, 0, %0, cr1, cr0, 0" : "=r"(c) ::);
-	c |= 0x1;
-	asm("mcr p15, 0, %0, cr1, cr0, 0" :: "r"(c) :);
+	mem_cache_flush();
 	
+	asm volatile ("mrc p15, 0, %0, cr1, cr0, 0" : "=r"(c) ::);
+	c |= 0x1;
+	// also enable D$, WB, L2
+	c |= (1 << 2) | (1 << 3) | (1 << 26) | (1 << 14);
+	asm volatile (".align 5 \n"
+	              "mcr p15, 0, %0, cr1, cr0, 0\n"
+	              "mrc p15, 0, %1, cr1, cr0, 0" : "=r"(c) : "r"(c) :);
+	asm volatile ("mcr p15, 0, %0, cr7, cr5, 4" :: "r"(0) :); //PrefetchFlush
+	asm volatile ("mcr p15, 0, %0, cr7, cr5, 6" :: "r"(0) :); //BTB Flush
 	mem_cache_flush();
 }
 
+extern void mem_arm_cache_mmu_off();
 void mem_mmu_disable()
 {
-	uint32_t c;
-	asm("mrc p15, 0, %0, cr1, cr0, 0" : "=r"(c) ::);
-	c &= ~0x1;
-	asm("mcr p15, 0, %0, cr1, cr0, 0" :: "r"(c) :);
-	
-	mem_cache_flush();
+	//fprintf(DEBUG, "Disabling MMU\r\n");
+	mem_arm_cache_mmu_off();
 }
 
 void mem_tlb_flush()
 {
-	asm("mcr p15, 0, r0, cr8, cr7, 0" :::);
+	asm volatile ("mcr p15, 0, %0, cr8, cr7, 0" :: "r"(0):);
+	asm volatile ("mcr p15, 0, %0, cr7, cr5, 4" :: "r"(0) :); //PrefetchFlush
 }
 
 void mem_tlb_evict(uintptr_t ptr)
@@ -261,15 +281,28 @@ void mem_tlb_evict(uintptr_t ptr)
 	}
 }
 
+extern void mem_arm_flush_dcache();
 void mem_cache_flush()
 {
-	if(!mem_cache_implemented) return;
-	
-	// Clean entire data and unified cache
-	if(mem_cache_unified) {
-		asm("mcr p15, 0, %0, cr7, cr15, 0" :: "r"(0):);
+	// fprintf(DEBUG, "Flushing D$\r\n");
+	if(!mem_cache_implemented) {
+		//fprintf(DEBUG, "No cache implemented\r\n");
+		return;
+	}
+
+	// Older versions of the ARM architecture support cleaning the 
+	// entire D cache in a single operation
+	if(mem_get_arm_arch_version() <= 5) {
+		// Clean entire data and unified cache
+		//fprintf(DEBUG, "Flushing cache (<=v5)\r\n");
+		if(mem_cache_unified) {
+			asm("mcr p15, 0, %0, cr7, cr15, 0" :: "r"(0):);
+		} else {
+			asm("mcr p15, 0, %0, cr7, cr14, 0" :: "r"(0):);
+		}
 	} else {
-		asm("mcr p15, 0, %0, cr7, cr14, 0" :: "r"(0):);
+		//fprintf(DEBUG, "Flushing cache (v7)\r\n");
+		mem_arm_flush_dcache();
 	}
 	
 	// Drain write buffer (DSB)
@@ -297,9 +330,22 @@ int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
 	
 	// Create a section descriptor pointing to the given physical address
 	// with full access permissions, domain 0, cacheable, buffered (outer and inner write back, no write allocate)
-	uint32_t descriptor = (phys_addr & 0xfff00000) | (0x3 << 10) | 0xc | 0x2;
-	
+	uint32_t base = (phys_addr & 0xfff00000);
+	uint32_t C = 1;
+	uint32_t B = 1;
+	uint32_t domain = 0;
+	uint32_t AP = 0x3;
+	uint32_t TEX = 0;
+	uint32_t descriptor = base | (TEX << 12) | (AP << 10) | (domain << 5) | (C << 3) | (B << 2) | 0x2;
+		
 	uint32_t *table_entry_ptr = &section_table[virt_addr >> 20];
+	
+	// Check to make sure we aren't overwriting an existing mapping
+	if(*table_entry_ptr && *table_entry_ptr != descriptor) {
+		fprintf(ERROR, "ERROR! Overwriting mapping for address %p! (0x%08x)\n", virt_addr, *table_entry_ptr);
+		arch_abort();
+	}
+	
 	*table_entry_ptr = descriptor;
 	
 	return 0;
@@ -316,9 +362,20 @@ int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 	}
 	// Create a section descriptor pointing to the given physical address
 	// with full access permissions, domain 0, non cached, buffered (device)
-	uint32_t descriptor = (phys_addr & 0xfff00000) | (0x3 << 10) | 0x4 | 0x2;
+	uint32_t base = (phys_addr & 0xfff00000);
+	uint32_t C = 0;
+	uint32_t B = 0;
+	uint32_t domain = 0;
+	uint32_t AP = 0x3;
+	uint32_t TEX = 0;
+	uint32_t descriptor = base | (TEX << 12) | (AP << 10) | (domain << 5) | (C << 3) | (B << 2) | 0x2;
 	
 	uint32_t *table_entry_ptr = &section_table[virt_addr >> 20];
+	if(*table_entry_ptr && *table_entry_ptr != descriptor) {
+		fprintf(ERROR, "ERROR! Overwriting mapping for address %p! (0x%08x)\n", virt_addr, *table_entry_ptr);
+		arch_abort();
+	}
+	
 	*table_entry_ptr = descriptor;
 	
 	return 0;

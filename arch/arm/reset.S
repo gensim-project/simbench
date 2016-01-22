@@ -20,11 +20,15 @@ reset_handler:
 .size reset_handler, .-reset_handler
 
 enable_caches:
-	// Need to set the C, W, Z, I and L2 bits (2, 3, 11, 12, 26) of system control register
-	// 0400180c
+	// Enable only I$ here. D$ can only be enabled when MMU is enabled
+	// Need to set the Z, I (11, 12) of system control register
+	
 	mrc p15, 0, r0, cr1, cr0, 0
-	ldr r1, =0x0400180c
-	orr r0, r1
+//	orr r0, #(1 << 2)  // Cache
+//	orr r0, #(1 << 3)  // Write buffer
+	orr r0, #(1 << 11) // Branch Prediction
+	orr r0, #(1 << 12) // L1 instruction cache
+//	orr r0, #(1 << 26) // L2 unified cache
 	mcr p15, 0, r0, cr1, cr0, 0
 	bx lr
 .ltorg
