@@ -33,6 +33,7 @@ void harness_main()
 {	
 	const benchmark_t *benchmark;
 	
+	fprintf(OUTPUT, "\r\n\r\n");
 	fprintf(OUTPUT, "\\\\BENCHMARKS BEGIN\r\n");
 	
 	for (benchmark = &_BENCHMARKS_START[0]; benchmark < _BENCHMARKS_END; benchmark++) {
