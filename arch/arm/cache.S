@@ -9,6 +9,8 @@
 .arm
 .syntax unified
 
+#ifdef ARCH_ARMV7
+
 .globl mem_arm_flush_dcache
 mem_arm_flush_dcache:
 	push {r4-r7, r9-r11, lr}
@@ -62,6 +64,8 @@ finished:
 	isb
 	mov pc, lr
 
+#endif
+
 .extern mem_cache_flush
 .globl mem_armv5_cache_mmu_off
 mem_armv5_cache_mmu_off:
@@ -84,6 +88,7 @@ mem_armv5_cache_mmu_off:
 	mcr p15, 0, r0, c7, c5, 4 // ISB
 	pop {r4-r7, r9-r11, pc}
 
+#ifdef ARCH_ARMV7
 
 .extern mem_cache_flush
 .globl mem_armv7_cache_mmu_off
@@ -127,3 +132,5 @@ mem_armv7_cache_mmu_on:
 	mcr p15, 0, r0, c7, c10, 4 // DSB
 	mcr p15, 0, r0, c7, c5, 4 // ISB
 	mov pc, r12
+
+#endif

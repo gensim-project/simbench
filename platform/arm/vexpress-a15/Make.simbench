@@ -1,4 +1,4 @@
-CFLAGS += #-march=armv7-a -DARCH_ARMV7
+CFLAGS += -march=armv7-a -DARCH_ARMV7
 
 LDSCRIPT=platform/arm/$(PLATFORM)/sys.ld
 $(SIMBENCH_APP): $(SIMBENCH_BUILTINS) $(LDSCRIPT)

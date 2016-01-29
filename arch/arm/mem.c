@@ -258,16 +258,30 @@ void mem_mmu_enable()
 	mem_cache_flush();
 }
 
-extern void mem_armv5_cache_mmu_off();
+
+
+#ifdef ARCH_ARMV7
 extern void mem_armv7_cache_mmu_off();
+#else 
+extern void mem_armv5_cache_mmu_off();
+#endif
+
 void mem_mmu_disable()
 {
 	switch(mem_get_arm_arch_version()) {
 		case 7:
+#ifdef ARCH_ARMV7
 			mem_armv7_cache_mmu_off();
+#else
+			arch_abort();
+#endif
 			break;
 		default:
+#ifdef ARCH_ARMV7
+			arch_abort();
+#else
 			mem_armv5_cache_mmu_off();
+#endif
 	}
 }
 
@@ -287,7 +301,10 @@ void mem_tlb_evict(uintptr_t ptr)
 	}
 }
 
+#ifdef ARCH_ARMV7
 extern void mem_arm_flush_dcache();
+#endif
+
 void mem_cache_flush()
 {
 	// fprintf(DEBUG, "Flushing D$\r\n");
@@ -307,8 +324,12 @@ void mem_cache_flush()
 			asm("mcr p15, 0, %0, cr7, cr14, 0" :: "r"(0):);
 		}
 	} else {
+#ifdef ARCH_ARMV7
 		//fprintf(DEBUG, "Flushing cache (v7)\r\n");
 		mem_arm_flush_dcache();
+#else
+		arch_abort();
+#endif
 	}
 	
 	// Drain write buffer (DSB)
