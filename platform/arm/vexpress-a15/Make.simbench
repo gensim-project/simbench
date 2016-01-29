@@ -1,0 +1,7 @@
+CFLAGS += #-march=armv7-a -DARCH_ARMV7
+
+LDSCRIPT=platform/arm/$(PLATFORM)/sys.ld
+$(SIMBENCH_APP): $(SIMBENCH_BUILTINS) $(LDSCRIPT)
+	@mkdir -p $(PLATOUTDIR) 
+	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
+	$(LD) -nostdlib -T $(LDSCRIPT) $(LDFLAGS) $(SIMBENCH_BUILTINS) -o $@
