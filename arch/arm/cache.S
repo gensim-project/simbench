@@ -11,7 +11,11 @@
 
 .globl mem_arm_flush_dcache
 mem_arm_flush_dcache:
-	push {r4-r7, r9-r11}
+	push {r4-r7, r9-r11, lr}
+	bl flush_cache_kernel
+	pop {r4-r7, r9-r11, pc}
+	
+flush_cache_kernel:
 	dmb					@ ensure ordering with previous memory accesses
 	mrc	p15, 1, r0, c0, c0, 1		@ read clidr
 	mov	r3, r0, lsr #23			@ move LoC into position
@@ -56,12 +60,12 @@ finished:
 	mcr	p15, 2, r10, c0, c0, 0		@ select current cache level in cssr
 	dsb	st
 	isb
-	pop {r4-r7, r9-r11}
-	bx lr
+	mov pc, lr
 
 .extern mem_cache_flush
 .globl mem_armv5_cache_mmu_off
 mem_armv5_cache_mmu_off:
+	push {r4-r7, r9-r11, lr}
 	mcr p15, 0, r0, c7, c10, 4 // DSB
 	mcr p15, 0, r0, c7, c5, 4 // ISB
 		
@@ -78,13 +82,13 @@ mem_armv5_cache_mmu_off:
 	mcr p15, 0, r0, c7, c5, 6 // BTB flush
 	mcr p15, 0, r0, c7, c10, 4 // DSB
 	mcr p15, 0, r0, c7, c5, 4 // ISB
-	mov pc, lr
+	pop {r4-r7, r9-r11, pc}
 
 
 .extern mem_cache_flush
 .globl mem_armv7_cache_mmu_off
 mem_armv7_cache_mmu_off:
-
+	push {r4-r7, r9-r11, lr}
 	dmb
 	dsb
 	
@@ -94,7 +98,28 @@ mem_armv7_cache_mmu_off:
 	mcr p15, 0, r0, c1, c0 
 	mov r12, lr
 	// Flush the caches
-	bl mem_arm_flush_dcache
+	bl flush_cache_kernel
+	
+	mov r0, #0
+	mcr p15, 0, r0, c8, c7, 0 // TLB Flush
+	mcr p15, 0, r0, c7, c5, 6 // BTB flush
+	mcr p15, 0, r0, c7, c10, 4 // DSB
+	mcr p15, 0, r0, c7, c5, 4 // ISB
+	pop {r4-r7, r9-r11, pc}
+	
+.globl mem_armv7_cache_mmu_on
+mem_armv7_cache_mmu_on:
+
+	dmb
+	dsb
+	
+	// Disable the MMU, D$, Write buffer
+	mrc p15, 0, r0, c1, c0 
+	orr r0, r0, #0xd
+	mcr p15, 0, r0, c1, c0 
+	mov r12, lr
+	// Flush the caches
+	bl flush_cache_kernel
 	
 	mov r0, #0
 	mcr p15, 0, r0, c8, c7, 0 // TLB Flush

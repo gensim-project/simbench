@@ -62,18 +62,26 @@ void arch_undef_install_skip()
 #define MODE_IRQ_DISABLE (1 << 7) 
 void arch_irq_enable()
 {
+#ifdef ARCH_ARMV7
+	asm volatile("cpsie i\n");
+#else
 	uint32_t mode;
 	asm("mrs %0, CPSR" : "=r"(mode));
 	mode &= ~MODE_IRQ_DISABLE;
 	asm("msr CPSR_c, %0" ::"r"(mode));
+#endif
 }
 
 void arch_irq_disable()
 {
+#ifdef ARCH_ARMV7
+	asm volatile("cpsid i\n");
+#else 
 	uint32_t mode;
 	asm("mrs %0, CPSR" : "=r"(mode));
 	mode |= MODE_IRQ_DISABLE;
 	asm("msr CPSR_c, %0" ::"r"(mode));	
+#endif
 }
 
 extern irq_handler_t arch_irq_handler;
