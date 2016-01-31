@@ -1,0 +1,13 @@
+changeset:   132:66bd64c9a723
+branch:      stable
+tag:         tip
+parent:      118:de931dd2a8c1
+user:        jenkins
+date:        Sun Jan 31 09:17:56 2016 +0000
+summary:     31-01-16 OK
+
+changeset:   131:999df5c8c2aa
+user:        Harry Wagstaff <fred.the.fish@gmail.com>
+date:        Fri Jan 29 16:36:43 2016 +0000
+summary:     Be more specific about architecture versions, #ifdef code depending on arch version selected (is there a gcc builtin macro for this?)
+
