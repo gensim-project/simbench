@@ -73,8 +73,8 @@ typedef struct {
 
 static uint64_t get_ticks_difference(struct timespec start, struct timespec end)
 {
-	uint64_t start_ticks = start.tv_sec*1000000000 + start.tv_nsec;
-	uint64_t end_ticks =   end.tv_sec*1000000000 + end.tv_nsec;
+        uint64_t start_ticks = (uint64_t) start.tv_sec)*((uint64_t)1000000000) + (uint64_t)start.tv_nsec;
+        uint64_t end_ticks =  ( (uint64_t)end.tv_sec)*((uint64_t)1000000000) +(uint64_t) end.tv_nsec;
 	
 	uint64_t ticks_taken = end_ticks - start_ticks;
 	
