@@ -4,8 +4,9 @@ EXTRA_TARGETS :=
 
 -include $(RDIR)/Makefile
 
-REAL_BUILTIN := $(RDIR)/built-in.o
-REAL_OBJ := $(patsubst %,$(RDIR)/%,$(OBJ))
+
+REAL_BUILTIN := $(RDIR)/.build/${ARCH}/${PLATFORM}/built-in.o
+REAL_OBJ := $(patsubst %,$(RDIR)/.build/${ARCH}/${PLATFORM}/%,$(OBJ))
 
 __build: $(REAL_BUILTIN) $(EXTRA_TARGETS) .FORCE
 	@echo -n
@@ -14,15 +15,18 @@ __build: $(REAL_BUILTIN) $(EXTRA_TARGETS) .FORCE
 
 $(REAL_BUILTIN): $(DIR)/Makefile $(REAL_OBJ)
 	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@)"
+	@mkdir -p $(dir $(REAL_BUILTIN))
 	$(Q)$(LD) -r -o $@ $(BUILTIN_LDFLAGS) $(REAL_OBJ)
 
-%.o: %.S
+$(RDIR)/.build/${ARCH}/${PLATFORM}/%.o: $(RDIR)/%.S
 	@echo "  AS      $(patsubst $(BASEDIR)/%,%,$@)"
+	@mkdir -p $(dir $@)
 	$(Q)$(CC) -c -o $@ $(CFLAGS) $<
 	$(Q)$(CC) -MM -MT "$@" $< $(CFLAGS) > $(@:.o=.d)
 
-%.o: %.c
+$(RDIR)/.build/${ARCH}/${PLATFORM}/%.o: $(RDIR)/%.c
 	@echo "  CC      $(patsubst $(BASEDIR)/%,%,$@)"
+	@mkdir -p $(dir $@)
 	$(Q)$(CC) -c -o $@ $(CFLAGS) $<
 	$(Q)$(CC) -MM -MT "$@" $< $(CFLAGS) > $(@:.o=.d)
 
