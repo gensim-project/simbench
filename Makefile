@@ -26,7 +26,7 @@ all: $(SIMBENCH_APP) $(HOST_APP)
 
 # Components
 SIMBENCH_DIRS		:= $(ARCHDIR) $(BMARKDIR) $(HARNESSDIR) $(PLATFORMDIR) $(UTILDIR)
-SIMBENCH_BUILTINS	:= $(patsubst %, %/built-in.o, $(SIMBENCH_DIRS))
+SIMBENCH_BUILTINS	:= $(patsubst %, %/.build/${ARCH}/${PLATFORM}/built-in.o, $(SIMBENCH_DIRS))
 SIMBENCH_CLEAN_DIRS	:= $(patsubst %,__clean-%,$(SIMBENCH_DIRS))
 
 # Build Configuration
@@ -38,8 +38,8 @@ ifeq ($(SIMBENCH_DEBUG),1)
 	export CFLAGS+=-DSIMBENCH_DEBUG
 endif
 
-%/built-in.o: .FORCE
-	@make -f build/Makefile.build DIR=$(dir $@) __build
+%/.build/${ARCH}/${PLATFORM}/built-in.o: .FORCE
+	@make -f build/Makefile.build DIR=$* __build
 
 $(HOST_APP): $(TOPOUTDIR) .FORCE
 	@make -C host
