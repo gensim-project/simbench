@@ -7,10 +7,16 @@ static phys_mem_info_t phys_info = {
 	.next_mem = 0
 };
 
+static phys_mem_info_t device_gic_info = {
+	.phys_mem_start = 0x1e000000,
+	.phys_mem_end   = 0x1e002000,
+	.next_mem       = 0
+};
+
 static phys_mem_info_t device_sp810_info = {
 	.phys_mem_start = 0x10000000,
 	.phys_mem_end   = 0x10000fff,
-	.next_mem       = 0
+	.next_mem       = &device_gic_info
 };
 
 static phys_mem_info_t device_uart_info = {
