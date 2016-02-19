@@ -2,7 +2,7 @@
 #include "debug.h"
 #include "benchmark.h"
 
-#define CODEGEN_ITERATIONS 1
+#define CODEGEN_ITERATIONS 100
 
 static benchmark_kernel_t volatile fn_table[];
 
