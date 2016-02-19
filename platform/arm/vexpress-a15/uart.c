@@ -23,6 +23,19 @@ struct uart_regs_t
 
 void uart_init()
 {
+	struct uart_regs_t *regs = (struct uart_regs_t*)(TTY_UART_BASE);
+	
+	// Set baud to 115200
+	regs->ibrd = 0x4;
+	
+	// Enable 8 bit mode
+	regs->lcr_h = (0x3 << 5);
+	
+	// Enable send/receive
+	regs->cr |= (1 << 8) | (1 << 7);
+	
+	// Enable the UART
+	regs->cr |= 0x1;
 	
 }
 

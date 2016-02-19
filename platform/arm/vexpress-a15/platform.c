@@ -9,7 +9,7 @@ void platform_init()
 	printf_register_output(uart_putc);
 	printf_register_debug(uart_putc);
 	printf_register_error(uart_putc);
-	}
+}
 
 void platform_shutdown()
 {
