@@ -55,12 +55,13 @@ void platform_trigger_swi()
 	uint32_t id2 = GICD_PIDR2;
 	uint32_t id3 = GICD_PIDR3;
 	
+/*
 	if(id0 != 0x90 || id1 != 0x13 || id2 != 0x4 || id3 != 0x0) {
 		fprintf(ERROR, "Could not identify GIC distributor interface!\r\n");
 		fprintf(ERROR, "Expected 90 13 4 0, got %x %x %x %x\r\n", id0, id1, id2, id3);
 		arch_abort();
 	} 
-	
+*/	
 	// Interrupt should be enabled by reset value of GICD_ISENABLER0
 	// but just to be sure
 	GICD_ISENABLER0 = 0xffff;
@@ -81,8 +82,8 @@ void platform_trigger_swi()
 	
 	
 	// generate SGI0
-	uint32_t targetlistfilter = 0x0;
-	uint32_t cputargetlist = 1;
+	uint32_t targetlistfilter = 0x2;
+	uint32_t cputargetlist = 0;
 	uint32_t nsatt = 0;
 	uint32_t sgiintid = 0;
 	
