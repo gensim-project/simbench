@@ -1,8 +1,13 @@
--include $(DIR)/Makefile
+RDIR := $(patsubst %/,%,$(DIR))
 
-REAL_CLEAN_OBJ := $(patsubst %,__clean_$(DIR)/%,$(OBJ))
-REAL_CLEAN_DEP := $(patsubst %.o,__clean_$(DIR)/%.d,$(OBJ))
-REAL_BUILTIN := $(DIR)/built-in.o
+EXTRA_TARGETS :=
+
+-include $(RDIR)/Makefile
+
+
+REAL_BUILTIN := $(RDIR)/.build/${ARCH}/${PLATFORM}/built-in.o
+REAL_CLEAN_OBJ := $(patsubst %,__clean_$(RDIR)/.build/${ARCH}/${PLATFORM}/%,$(OBJ))
+REAL_CLEAN_DEP := $(patsubst %.o,__clean_$(RDIR)/.build/${ARCH}/${PLATFORM}/%.d,$(OBJ))
 
 __clean: $(REAL_CLEAN_OBJ) $(REAL_CLEAN_DEP) .FORCE
 	@echo "  RM      $(patsubst $(BASEDIR)/%,%,$(REAL_BUILTIN))"
