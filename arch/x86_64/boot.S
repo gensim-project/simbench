@@ -1,9 +1,9 @@
 .code32
-//#define DEBUG_BOOT
+#define DEBUG_BOOT
 #define MULTIBOOT_HEADER_MAGIC 0x1BADB002
 #define MULTIBOOT_HEADER_FLAGS 0x00000003
 
-#define INIT_PGT	0x0b000
+#define INIT_PGT	0x08000
 
 .section ".bootstrap", "ax"
 
@@ -41,6 +41,14 @@ start32:
 	pushl $0
 	pushl %eax
 
+	cld
+	call clear_screen
+
+#ifdef DEBUG_BOOT
+	lea msg_disable_irq, %esi
+	call printstr32
+#endif
+
 	// Disable IRQs
 	mov $0xff, %al
 	out %al, $0xa1
@@ -50,14 +58,53 @@ start32:
 	nop
 	nop
 
+/*	mov %cr0, %edx
+	std
+
+	mov $0xb800e, %edi
+	call pr_hex
+
+1:
+	jmp 1b
+
+pr_hex:
+	mov $8, %esi
+	mov $0xf00, %ax
+
+1:
+	test %esi, %esi
+	jz 3f
+
+	mov %dl, %al
+	shr $4, %edx
+	and $0xf, %al
+	add $0x30, %al
+	cmp $0x39, %al
+	jbe 2f
+	add $0x7, %al
+
+2:
+	stosw
+	dec %esi
+	jmp 1b
+
+3:
+	ret*/
+
 #ifdef DEBUG_BOOT
 	// Print out a debugging message
-	lea msg1, %edi
+	lea msg_prep_pgt, %esi
 	call printstr32
 #endif
 
 	// Load a NULL IDT
 	lidt idt_ptr
+
+#ifdef DEBUG_BOOT
+	// Print out a debugging message
+	lea msg_build_pgt, %esi
+	call printstr32
+#endif
 
 	// Build the initial page tables
 	mov $(INIT_PGT), %edi
@@ -65,82 +112,107 @@ start32:
 
 	call build_pagetables
 
+#ifdef DEBUG_BOOT
+	// Print out a debugging message
+	lea msg_sysreg, %esi
+	call printstr32
+#endif
+
 	// Initialise CR4 with: PSE, PAE, PGE, OSFXSR, OSXMMEXCPT
 	mov $0x6b0, %eax
-	mov %eax, %cr4 
+	mov %eax, %cr4
 
 	// Read the EFER
-	mov $0xc0000080, %ecx 
+	mov $0xc0000080, %ecx
 	rdmsr
-	
-	// Initialise EFER with: SCE, LME, NXE
+
+	// Initialise EFER with: LME
 	or $0x901, %eax
 	wrmsr
- 
+
 	// Initialise CR0 with: PE, MP, EM, WP, PG
 	mov %cr0, %eax
 	or $0x80010007, %eax
-	mov %eax, %cr0                    
+	mov %eax, %cr0
 
 	// Load the 64-bit GDT
 	lgdt %cs:gdt_ptr
 
 #ifdef DEBUG_BOOT
 	// Print out a debugging message
-	lea msg2, %edi
+	lea msg_jump64, %esi
 	call printstr32
 #endif
 
 	// Chump to the 64-bit entry-point
 	ljmp $0x08, $start64
 
-build_pagetables:
+build_pagetables:	// EDI = PML4
+	mov %edi, %ebx
+	cld
+
+	// Clear out the PML4
+	lea (%ebx), %edi
+	xor %eax, %eax
+	mov $0x400, %ecx
+	rep stosl
+
 	// PML4 - Single entry
-	lea 0x1000(%edi), %eax
-	or $3, %eax
-	mov %eax, (%edi)
+	lea 0x1000(%ebx), %edx
+	or $3, %edx
+	mov %edx, (%ebx)
+
+	// Clear out the PDPT
+	lea 0x1000(%ebx), %edi
+	xor %eax, %eax
+	mov $0x400, %ecx
+	rep stosl
 
 	// Detect whether or not we can use 1Gb pages
 	mov $0x80000001, %eax
+
+	push %ebx		// JIC
 	cpuid
+	pop %ebx		// JIC
+
 	andl $(1<<26), %edx
 
 	jz pt2mb
 
 #ifdef DEBUG_BOOT
 	// Print out a debugging message
-	push %edi
-	lea using_1gb, %edi
+	lea using_1gb, %esi
 	call printstr32
-	pop %edi
 #endif
 
 	// Insert 1GiB page entry into PDP[0]
-	mov $0x83, %eax
-	mov %eax, 0x1000(%edi)
+	movb $0x83, 0x1000(%ebx)
 
 	ret
 
 pt2mb:
 #ifdef DEBUG_BOOT
 	// Print out a debugging message
-	push %edi
-	lea using_2mb, %edi
+	lea using_2mb, %esi
 	call printstr32
-	pop %edi
 #endif
 
-	// PDPT
-	lea 0x2000(%edi), %eax
-	or $0x3, %eax
-	mov %eax, 0x1000(%edi)
+	// PD
+	lea 0x2000(%ebx), %edx
+	or $0x3, %edx
+	mov %edx, 0x1000(%ebx)
 
-	// PDP - Map a bunch of 2MiB pages
+	lea 0x2000(%ebx), %edi
+	xor %eax, %eax
+	mov $0x400, %ecx
+	rep stosl
+
+	// PD - Map a bunch of 2MiB pages
 	mov $0x83, %eax
 	xorl %ecx, %ecx
 
 1:
-	mov %eax, 0x2000(%edi, %ecx, 8)
+	mov %eax, 0x2000(%ebx, %ecx, 8)
 	add $0x200000, %eax
 
 	incl %ecx
@@ -149,17 +221,47 @@ pt2mb:
 
 	ret
 
-#ifdef DEBUG_BOOT
-printstr32:
-	movb (%edi), %al
-	cmpb $0, %al
-	jz 1f
+clear_screen:
+	mov $0xb8000, %edi
+	mov $((25*80*2)/4), %ecx
+	xor %eax, %eax
 
-	outb %al, $0xe9
-	inc %edi
-	jmp printstr32
+	rep stosl
+
+	ret
+
+#ifdef DEBUG_BOOT
+printstr_x: .long 0
+printstr_y: .long 0
+
+// Clobbers EAX and EDI
+printstr32:
+	movl printstr_x, %eax
+	movl printstr_y, %edi
+	leal (%edi, %edi, 4), %edi
+	shl $0x4, %edi
+	add %eax, %edi
+	lea 0xb8000(%edi, %edi, 1), %edi
+	mov $0x0e00, %ax
 
 1:
+	lodsb
+	test %al, %al
+	jz 3f
+
+	cmp $0x0a, %al
+	jne 2f
+
+	movl $0, printstr_x
+	incl printstr_y
+	jmp printstr32
+
+2:
+	stosw
+	incl printstr_x
+	jmp 1b
+
+3:
 	ret
 #endif
 
@@ -167,12 +269,6 @@ printstr32:
 
 .code64
 start64:
-#ifdef DEBUG_BOOT
-	// Print out a friendly message
-	lea msg3, %rdi
-	call printstr64
-#endif
-
 	// Load the segment registers with the data segment selector
 	mov $0x10, %ax
 	mov %ax, %ds
@@ -180,6 +276,16 @@ start64:
 	mov %ax, %fs
 	mov %ax, %gs
 	mov %ax, %ss
+
+	//call clear_screen64
+
+	// Zero out the BSS
+	mov $_BSS_START, %rdi
+	mov $_BSS_END, %rcx
+	sub %rdi, %rcx
+	shr $3, %ecx
+	xor %eax, %eax
+	rep stosq
 
 	// Grab the saved multiboot arguments
 	pop %rdi
@@ -198,26 +304,26 @@ start64:
 	pause
 	jmp 1b
 
-#ifdef DEBUG_BOOT
-printstr64:
-	movb (%rdi), %al
-	cmpb $0, %al
-	jz 1f
+clear_screen64:
+	lea 0xb8000, %rdi
+	mov $0x1f4, %ecx
 
-	outb %al, $0xe9
-	inc %rdi
-	jmp printstr64
+	xor %eax, %eax
 
-1:
+	cld
+	rep stosq
+
 	ret
-#endif
 
 .data
 
 #ifdef DEBUG_BOOT
-msg1: .asciz "About to enter long mode...\n"
-msg2: .asciz "Really about to enter long mode...\n"
-msg3: .asciz "Hello from long mode!  Reloading segment registers...\n"
+msg_disable_irq: .asciz "Disabling interrupts...\n"
+msg_prep_pgt: .asciz "Preparing page-tables...\n"
+msg_build_pgt: .asciz "Building page-tables...\n"
+msg_sysreg: .asciz "Populating system registers...\n"
+msg_jump64: .asciz "Jumping to 64-bit mode...\n"
+msg3: .asciz "Hello from 64-bit mode!\n"
 using_2mb: .asciz "Using 2mb pages\n"
 using_1gb: .asciz "Using 1gb pages\n"
 #endif

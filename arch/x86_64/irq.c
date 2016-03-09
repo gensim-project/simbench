@@ -23,6 +23,7 @@ extern void trap_page_fault(struct mcontext *);
 extern void trap_syscall(struct mcontext *);
 extern void trap_irq(struct mcontext *);
 extern void trap_undef(struct mcontext *);
+extern void trap_gpf(struct mcontext *);
 
 syscall_handler_fn_t syscall_handler_fn;
 page_fault_handler_fn_t page_fault_handler_fn;
@@ -134,7 +135,7 @@ void irq_init()
 	set_idt(&idt[0x0a], trap_unknown_arg, 0);
 	set_idt(&idt[0x0b], trap_unknown_arg, 0);
 	set_idt(&idt[0x0c], trap_unknown_arg, 0);
-	set_idt(&idt[0x0d], trap_unknown_arg, 0);
+	set_idt(&idt[0x0d], trap_gpf, 0);
 	set_idt(&idt[0x0e], trap_page_fault, 0);
 	set_idt(&idt[0x11], trap_unknown_arg, 0);
 	set_idt(&idt[0x1e], trap_unknown_arg, 0);
@@ -200,5 +201,35 @@ void handle_trap_unknown(struct mcontext *mcontext)
 void handle_trap_unknown_arg(struct mcontext *mcontext, uint64_t val)
 {
 	fprintf(ERROR, "unknown exception from rip=%lx, val=%lx\n", mcontext->rip, val);
+	arch_abort();
+}
+
+static void dump_context(struct mcontext *mcontext)
+{
+	fprintf(ERROR, "machine context:\n");
+	fprintf(ERROR, "  rax = %lx\n", mcontext->rax);
+	fprintf(ERROR, "  rbx = %lx\n", mcontext->rbx);
+	fprintf(ERROR, "  rcx = %lx\n", mcontext->rcx);
+	fprintf(ERROR, "  rdx = %lx\n", mcontext->rdx);
+	fprintf(ERROR, "  rsi = %lx\n", mcontext->rsi);
+	fprintf(ERROR, "  rdi = %lx\n", mcontext->rdi);
+	fprintf(ERROR, "  rbp = %lx\n", mcontext->rbp);
+	fprintf(ERROR, "  r8  = %lx\n", mcontext->r8);
+	fprintf(ERROR, "  r9  = %lx\n", mcontext->r9);
+	fprintf(ERROR, "  r10 = %lx\n", mcontext->r10);
+	fprintf(ERROR, "  r11 = %lx\n", mcontext->r11);
+	fprintf(ERROR, "  r12 = %lx\n", mcontext->r12);
+	fprintf(ERROR, "  r13 = %lx\n", mcontext->r13);
+	fprintf(ERROR, "  r14 = %lx\n", mcontext->r14);
+	fprintf(ERROR, "  r15 = %lx\n", mcontext->r15);
+	fprintf(ERROR, "  rip = %lx\n", mcontext->rip);
+}
+
+void handle_trap_gpf(struct mcontext *mcontext, uint64_t val)
+{
+	fprintf(ERROR, "*********\n");
+	fprintf(ERROR, "general protection fault: rip=%lx, val=%lx\n", mcontext->rip, val);
+	dump_context(mcontext);
+	fprintf(ERROR, "*********\n");
 	arch_abort();
 }

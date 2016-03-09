@@ -1,0 +1,6 @@
+$(SIMBENCH_APP): $(SIMBENCH_BUILTINS) platform/x86_64/native/sys.ld
+	@mkdir -p $(PLATOUTDIR)
+	@echo "  LD      $(patsubst $(BASEDIR)/%,%,$@).64"
+	$(Q)$(LD) -n -nostdlib -z nodefaultlib -T platform/x86_64/native/sys.ld $(LDFLAGS) $(SIMBENCH_BUILTINS) -o $(SIMBENCH_APP).64
+	@echo "  OBJCOPY $(patsubst $(BASEDIR)/%,%,$@)"
+	$(Q)objcopy --input-target=elf64-x86-64 --output-target=elf32-i386 $(SIMBENCH_APP).64 $@

@@ -2,6 +2,7 @@
 #include "benchmark.h"
 #include "debug.h"
 #include "mem.h"
+#include "printf.h"
 
 #define EXCEPTION_BENCHMARK_ITERATIONS 2500
 
@@ -24,7 +25,7 @@ static void kernel_init()
 	mem_init();
 	mem_mmu_enable();
 	mem_tlb_flush();
-	
+
 	arch_undef_install_skip();
 }
 static void kernel_cleanup()

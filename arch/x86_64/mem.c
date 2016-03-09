@@ -4,6 +4,7 @@
 #include "x86.h"
 #include "debug.h"
 #include "heap.h"
+#include "printf.h"
 
 static uintptr_t initial_pagetables;
 static uintptr_t runtime_pagetables;
@@ -16,7 +17,7 @@ extern char _TEXT_START, _TEXT_END, _DATA_START, _DATA_END, _HEAP_START, _HEAP_S
 static void map_page_ranges(uintptr_t phys_addr, uintptr_t virt_addr, int nr_pages)
 {
 	int i;
-	
+
 	for (i = 0; i < nr_pages; i++) {
 		mem_create_page_mapping(phys_addr, virt_addr);
 		
@@ -27,6 +28,9 @@ static void map_page_ranges(uintptr_t phys_addr, uintptr_t virt_addr, int nr_pag
 
 static void prepare_runtime_pagetables()
 {
+	// Map the framebuffer
+	map_page_ranges(0xb8000, 0xb8000, 1);
+	
 	// Map the .text section
 	map_page_ranges(PAGE_ADDR(_TEXT_START), PAGE_ADDR(_TEXT_START), NR_PAGES(_TEXT_START, _TEXT_END));
 
@@ -38,6 +42,8 @@ static void prepare_runtime_pagetables()
 	
 	// Map the LAPIC
 	mem_create_page_mapping((uintptr_t)LAPIC, (uintptr_t)LAPIC);
+	
+	mem_tlb_flush();
 }
 
 static int mem_inited;
@@ -145,9 +151,12 @@ static inline table_indicies calculate_indicies(uintptr_t virt_addr)
 	return ret;
 }
 
+static int x;
 static int __create_page_mapping(uintptr_t pml4, uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	table_indicies idx = calculate_indicies(virt_addr);
+
+//	fprintf(ERROR, "mapping va=%p to pa=%p pml=%d,pdp=%d,pd=%d,pt=%d\n", virt_addr, phys_addr, idx.pml, idx.pdp, idx.pd, idx.pt);
 	
 	pte *pml = &((pte *)pml4)[idx.pml];
 	if (!is_present(pml)) {
@@ -193,6 +202,8 @@ int mem_create_page_mapping_device(uintptr_t phys_addr, uintptr_t virt_addr)
 
 void early_mem_init()
 {
-	initial_pagetables = (uintptr_t)0xb000;
+	initial_pagetables = (uintptr_t)0x8000;
 	__create_page_mapping(initial_pagetables, (uintptr_t)LAPIC, (uintptr_t)LAPIC);
+
+	mem_tlb_flush();
 }

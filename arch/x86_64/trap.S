@@ -65,6 +65,7 @@ trap_\name:
 
 trap_macro unknown,0
 trap_macro unknown_arg,1
+trap_macro gpf,1
 
 .extern syscall_handler_fn
 .globl trap_syscall
