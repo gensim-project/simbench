@@ -3,7 +3,7 @@
 #include "mem.h"
 #include "arch.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 100000
+#define MEMORY_BENCHMARK_ITERATIONS 300000
 
 static volatile uint32_t value = 0;
 

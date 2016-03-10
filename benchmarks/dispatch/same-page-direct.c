@@ -1,7 +1,7 @@
 #include "benchmark.h"
 #include "debug.h"
 
-#define DISPATCH_ITERATIONS 50000
+#define DISPATCH_ITERATIONS 500000
 
 #define NOREORDER 
 #define NOINLINE __attribute__((noinline))
