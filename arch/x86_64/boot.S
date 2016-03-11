@@ -296,6 +296,7 @@ start64:
 	push %rax
 
 	// Begin!
+	sti
 	call arch_start
 
 	// If we get here, loop forever.
