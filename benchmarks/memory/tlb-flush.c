@@ -1,6 +1,7 @@
 #include "benchmark.h"
 #include "debug.h"
 #include "mem.h"
+#include "printf.h"
 
 #define MEMORY_BENCHMARK_ITERATIONS 2000
 #define VIRT_BASE 0x40000000
@@ -15,22 +16,23 @@ static void kernel_mmu_init()
 
 	// Map physical memory into a virtual memory region
 	const phys_mem_info_t *phys_mem = mem_get_phys_info();
-	
+
 	// Identity map the physical memory region
 	uintptr_t ptr = phys_mem->phys_mem_start;
 	uintptr_t vptr = phys_mem->phys_mem_start;
-	
+
 	virt_start = vptr;
-	
+
 	size_t pagesize = mem_get_page_size();
+
 	while(ptr < phys_mem->phys_mem_end) {
 		mem_create_page_mapping(ptr, vptr);
 		ptr += pagesize;
 		vptr += pagesize;
 	}
-	
+
 	virt_end = vptr;
-	
+
 	mem_mmu_enable();
 	mem_tlb_flush();
 }

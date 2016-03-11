@@ -2,9 +2,9 @@ SECTIONS
 {
 	. = 1M;
 
-	.text : 
-	{ 
-		_TEXT_START = .;
+	_TEXT_START = .;
+	.text :
+	{
 		KEEP(*(.bootstrap))
 		*(.text)
 		*(.text.*)
@@ -22,10 +22,10 @@ SECTIONS
 	}
 
 	.data : ALIGN(4k)
-	{ 
+	{
 		*(.data)
 	}
-	
+
 	.benchmarks : ALIGN(4k)
 	{
 		. = ALIGN(8);
@@ -36,16 +36,19 @@ SECTIONS
 
 	.bss : ALIGN(4k)
 	{
+		_BSS_START = .;
 		*(COMMON)
 		*(.bss)
 	}
-	
+	_BSS_END = .;
+
+	. = ALIGN(8);
 	_DATA_END = .;
 
 	. = ALIGN(4k);
 
 	_HEAP_START = .;
-	_HEAP_SIZE = 0x400000;
+	_HEAP_SIZE = 0x40000;
 }
 
 ENTRY(multiboot_start)

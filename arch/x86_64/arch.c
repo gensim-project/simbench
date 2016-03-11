@@ -10,9 +10,9 @@ extern void early_mem_init();
 
 void arch_init()
 {
-	early_mem_init();
-	
 	heap_init();
+	
+	early_mem_init();
 	irq_init();
 }
 
