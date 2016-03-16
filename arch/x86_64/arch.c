@@ -6,12 +6,14 @@
 #include "irq.h"
 #include "heap.h"
 
+int use_framebuffer;
+
 extern void early_mem_init();
 
 void arch_init()
 {
 	heap_init();
-	
+
 	early_mem_init();
 	irq_init();
 }
@@ -32,12 +34,33 @@ uint32_t arch_nonpriviliged_read(volatile uint32_t *ptr)
 	return *ptr;
 }
 
-extern char _HEAP_START;
+static void parse_cmdline(uintptr_t cmdline_ptr)
+{
+	const char *cmdline = (const char *)cmdline_ptr;
+	while (*cmdline) {
+		switch (*cmdline++) {
+		case 'f':
+			switch (*cmdline++) {
+			case 'b':
+				switch (*cmdline++) {
+				case ' ':
+				case '\0':
+					use_framebuffer = 1;
+					break;
+				}
+			}
+			break;
+		}
+	}
+}
 
+extern char _HEAP_START;
 void arch_start(unsigned int magic, void *mb_info)
 {
 	uint64_t rsp;
 	asm volatile("mov %%rsp, %0\n" : "=r"(rsp));
+
+	parse_cmdline(0x7000);
 
 	arch_init();
 	platform_init();

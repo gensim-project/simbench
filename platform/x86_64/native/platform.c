@@ -8,12 +8,18 @@
 extern void lapic_issue_interrupt(int irq);
 extern void lapic_acknowledge_irq(void);
 
+extern int use_framebuffer;
+
 void platform_init()
 {
 	console_init();
 	serial_init();
 
-	printf_register_output(serial_putc);
+	if (use_framebuffer)
+		printf_register_output(console_putc);
+	else
+		printf_register_output(serial_putc);
+
 	printf_register_debug(console_putc);
 	printf_register_error(console_putc);
 }
