@@ -41,7 +41,17 @@ start32:
 	pushl $0
 	pushl %eax
 
+	test %ebx, %ebx
 	cld
+	jz 1f
+
+	mov 0x10(%ebx), %esi
+	mov $0x7000, %edi
+
+	mov $0x40, %ecx
+	rep movsl
+
+1:
 	call clear_screen
 
 #ifdef DEBUG_BOOT
@@ -349,4 +359,3 @@ __gdt:
 	// Kernel DS
 	.quad 0x0000920000000000
 __gdt_end:
-
