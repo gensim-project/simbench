@@ -38,6 +38,13 @@ The stdbuf program is used to disable output buffering so that the timing
 information produced by Simbench is delivered to the host application in a 
 timely fashion.
 
+Note that some platforms require more than the default amount of memory
+provided by QEMU (e.g., the versatileab platform, as seen above):
+
+versatileab:   512
+vexpress-a15: 2048
+vexpress-a9:  1024
+
 4. Debugging Simbench
 
 Simbench has built in lightweight logging. To enable the debugging logs, define
