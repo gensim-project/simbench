@@ -4,7 +4,7 @@
 #include "mem.h"
 #include "platform.h"
 
-#define EXCEPTION_BENCHMARK_ITERATIONS 2500
+#define EXCEPTION_BENCHMARK_ITERATIONS 20000
 
 __align12;
 

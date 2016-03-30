@@ -2,7 +2,7 @@
 #include "debug.h"
 #include "mem.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 200000
+#define MEMORY_BENCHMARK_ITERATIONS 500000
 
 static volatile uint32_t value = 0;
 

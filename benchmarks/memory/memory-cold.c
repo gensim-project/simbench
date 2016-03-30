@@ -3,7 +3,7 @@
 #include "harness.h"
 #include "mem.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 20000
+#define MEMORY_BENCHMARK_ITERATIONS 50000
 
 static void ALIGN kernel()
 {

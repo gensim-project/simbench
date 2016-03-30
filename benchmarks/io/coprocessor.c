@@ -4,7 +4,7 @@
 #include "mem.h"
 #include "platform.h"
 
-#define IO_BENCHMARK_ITERATIONS 25000
+#define IO_BENCHMARK_ITERATIONS 250000
 
 __align12;
 

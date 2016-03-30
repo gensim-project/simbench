@@ -1,7 +1,7 @@
 #include "benchmark.h"
 #include "debug.h"
 
-#define DISPATCH_ITERATIONS 100
+#define DISPATCH_ITERATIONS 250
 
 #define leaf_fn(x) static void ALIGN fn ## x() {}
 

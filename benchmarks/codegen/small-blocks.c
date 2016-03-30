@@ -2,12 +2,13 @@
 #include "debug.h"
 #include "benchmark.h"
 
-#define CODEGEN_ITERATIONS 1
+#define CODEGEN_ITERATIONS 100
 
 static benchmark_kernel_t volatile fn_table[];
 
 // For each function, indirectly call the next, in order to avoid direct chaining during translation
-#define DOFN(x) static void NOINLINE fn##x() { fn_table[x](); }
+// It would be nice if we could call directly but I can't see a way to do that in C (maybe some preprocessor magic?)
+#define DOFN(x) static void NOINLINE fn##x() { asm volatile (""); fn_table[x](); }
 #define LASTFN(x) static void NOINLINE fn##x() { }
 #include "small-blocks-fns.h"
 #undef DOFN

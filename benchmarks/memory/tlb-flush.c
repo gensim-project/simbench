@@ -3,7 +3,7 @@
 #include "mem.h"
 #include "printf.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 2000
+#define MEMORY_BENCHMARK_ITERATIONS 4000
 #define VIRT_BASE 0x40000000
 
 __align12;

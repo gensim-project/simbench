@@ -3,7 +3,7 @@
 #include "debug.h"
 #include "mem.h"
 
-#define EXCEPTION_BENCHMARK_ITERATIONS 2500
+#define EXCEPTION_BENCHMARK_ITERATIONS 50000
 
 __align12;
 

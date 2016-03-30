@@ -3,7 +3,7 @@
 #include "debug.h"
 #include "mem.h"
 
-#define EXCEPTION_BENCHMARK_ITERATIONS 5000
+#define EXCEPTION_BENCHMARK_ITERATIONS 25000
 
 static void (*ptr)() = (void (*))0xc0000000;
 

@@ -4,7 +4,7 @@
 #define NOREORDER 
 //#define NOREORDER __attribute__((no_reorder))
 
-#define DISPATCH_ITERATIONS 100
+#define DISPATCH_ITERATIONS 200
 
 __align12 NOREORDER;
 
