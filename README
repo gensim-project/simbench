@@ -64,3 +64,6 @@ ARM:
 	Versatile Application Baseboard
 	Realview Platform Baseboard (A8)
 	Arndale Board
+
+X86-64:
+	Native -- works in QEMU too
