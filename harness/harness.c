@@ -10,6 +10,8 @@ void harness_init()
 
 static void harness_execute(const benchmark_t *benchmark)
 {
+	uint64_t start, stop;
+
 	fprintf(OUTPUT, "%s - %s", benchmark->category, benchmark->name);
 	
 	if (benchmark->kernel_init) benchmark->kernel_init();
@@ -22,10 +24,13 @@ static void harness_execute(const benchmark_t *benchmark)
 		fprintf(OUTPUT, "}");
 	}
 	
+	timer_reset();
+	timer_start();
+	
 	fprintf(OUTPUT, " [");
 	benchmark->kernel();
 	fprintf(OUTPUT, "]\r\n");
-	
+
 	if (benchmark->kernel_cleanup) benchmark->kernel_cleanup();
 }
 

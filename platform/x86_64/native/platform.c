@@ -4,6 +4,7 @@
 #include "arch.h"
 #include "debug.h"
 #include "serial.h"
+#include "timer.h"
 
 extern void lapic_issue_interrupt(int irq);
 extern void lapic_acknowledge_irq(void);
@@ -22,6 +23,8 @@ void platform_init()
 
 	printf_register_debug(console_putc);
 	printf_register_error(console_putc);
+
+	timer_init();
 }
 
 void platform_shutdown()

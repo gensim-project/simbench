@@ -23,6 +23,11 @@ extern void irq_reset_undef_handler();
 extern void lapic_acknowledge_irq();
 extern void lapic_issue_interrupt(int irq);
 
+extern void lapic_timer_reset();
+extern void lapic_timer_start();
+extern void lapic_timer_stop();
+extern uint32_t lapic_timer_read();
+
 #define LAPIC ((volatile uint32_t *)0x0000fee00000ULL)
 
 // Local APIC registers, divided by 4 for use as uint[] indices.
