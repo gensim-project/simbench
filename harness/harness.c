@@ -21,11 +21,11 @@ static void harness_execute(const benchmark_t *benchmark)
 		benchmark->kernel_control();
 		fprintf(OUTPUT, "}");
 	}
-	
+
 	fprintf(OUTPUT, " [");
 	benchmark->kernel();
 	fprintf(OUTPUT, "]\r\n");
-	
+
 	if (benchmark->kernel_cleanup) benchmark->kernel_cleanup();
 }
 

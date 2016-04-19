@@ -24,6 +24,7 @@ extern void trap_syscall(struct mcontext *);
 extern void trap_irq(struct mcontext *);
 extern void trap_undef(struct mcontext *);
 extern void trap_gpf(struct mcontext *);
+extern void trap_timer(struct mcontext *);
 
 syscall_handler_fn_t syscall_handler_fn;
 page_fault_handler_fn_t page_fault_handler_fn;
@@ -93,6 +94,7 @@ static void lapic_init()
 {
 	lapic_write(SVR, 0x1ff);
 
+	lapic_write(TIMER, MASKED);
 	lapic_write(LINT0, MASKED);
 	lapic_write(LINT1, MASKED);
 	lapic_write(LERROR, MASKED);
@@ -108,6 +110,30 @@ static void lapic_init()
 	while (lapic_read(ICRLO) & DELIVS);
 
 	lapic_write(TPR, 0);
+
+	lapic_timer_reset();
+}
+
+uint32_t lapic_timer_read()
+{
+	return (uint32_t)lapic_read(TCCR);
+}
+
+void lapic_timer_start()
+{
+	lapic_write(TIMER, 32);
+}
+
+void lapic_timer_stop()
+{
+	lapic_write(TIMER, MASKED);
+}
+
+void lapic_timer_reset()
+{
+	lapic_write(TIMER, MASKED);
+	lapic_write(TDCR, 3);
+	lapic_write(TICR, 0xffffffff);
 }
 
 void irq_init()
@@ -139,6 +165,7 @@ void irq_init()
 	set_idt(&idt[0x0e], trap_page_fault, 0);
 	set_idt(&idt[0x11], trap_unknown_arg, 0);
 	set_idt(&idt[0x1e], trap_unknown_arg, 0);
+	set_idt(&idt[0x20], trap_timer, 0);
 	set_idt(&idt[0x30], trap_irq, 0);
 	set_idt(&idt[0x80], trap_syscall, 1);
 
@@ -232,4 +259,9 @@ void handle_trap_gpf(struct mcontext *mcontext, uint64_t val)
 	dump_context(mcontext);
 	fprintf(ERROR, "*********\n");
 	arch_abort();
+}
+
+void handle_trap_timer(struct mcontext *mcontext)
+{
+	// TODO: Handle overflow
 }
