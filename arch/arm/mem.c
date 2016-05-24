@@ -3,8 +3,6 @@
 #include "printf.h"
 #include "debug.h"
 
-#define DEBUG_MEM
-
 #if !defined(SIMBENCH_DEBUG) && defined(DEBUG_MEM)
 #warning "DEBUG_MEM defined, but SIMBENCH_DEBUG not defined"
 #endif

@@ -1,7 +1,6 @@
 #include "benchmark.h"
 #include "debug.h"
 
-#define DISPATCH_ITERATIONS 250
 
 #define leaf_fn(x) static void ALIGN fn ## x() {}
 
@@ -35,10 +34,10 @@ static benchmark_kernel_t fn_table[FN_TABLE_SIZE] = { fn1, fn2, fn3, fn4, fn5, f
 
 static void kernel()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_IPI_BENCHMARK_ITERATIONS;
 	int i = 0;
 	
-	debug_spinner_start(DISPATCH_ITERATIONS);
+	debug_spinner_start(DISPATCH_IPI_BENCHMARK_ITERATIONS);
 	
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -50,5 +49,5 @@ DEFINE_BENCHMARK(inter_page_indirect) = {
 	.name="Inter-Page-Indirect",
 	.category="Dispatch",
 	.kernel=kernel,
-	.iteration_count = DISPATCH_ITERATIONS * BENCHMARK_ITERATIONS
+	.iteration_count = DISPATCH_IPI_BENCHMARK_ITERATIONS * BENCHMARK_ITERATIONS
 };

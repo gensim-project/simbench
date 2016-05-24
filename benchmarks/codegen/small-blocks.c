@@ -2,7 +2,6 @@
 #include "debug.h"
 #include "benchmark.h"
 
-#define CODEGEN_ITERATIONS 100
 
 static benchmark_kernel_t volatile fn_table[];
 
@@ -61,9 +60,9 @@ static void kernel_init()
 static void ALIGN kernel()
 {
 	uint32_t i;
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_SB_BENCHMARK_ITERATIONS;
 	
-	debug_spinner_start(CODEGEN_ITERATIONS);
+	debug_spinner_start(CODEGEN_SB_BENCHMARK_ITERATIONS);
 	
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -75,9 +74,9 @@ static void ALIGN kernel()
 static void ALIGN kernel_control()
 {
 	uint32_t i;
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_SB_BENCHMARK_ITERATIONS;
 	
-	debug_spinner_start(CODEGEN_ITERATIONS);
+	debug_spinner_start(CODEGEN_SB_BENCHMARK_ITERATIONS);
 	
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -92,6 +91,6 @@ DEFINE_BENCHMARK(small_blocks) = {
 	.kernel_init=kernel_init,
 	.kernel=kernel,
 	.kernel_control=kernel_control,
-	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_SB_BENCHMARK_ITERATIONS
 };
 
