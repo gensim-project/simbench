@@ -3,13 +3,21 @@ import optparse
 import sys
 
 import time
-
+import os
 import m5
 from m5.defines import buildEnv
 from m5.objects import *
 from m5.util import addToPath, fatal
 
-gem5_path='/home/harry/Work/gem5/gem5-stable'
+if os.getenv("GEM5_PATH") == None :
+    raise Exception("GEM5_PATH is not defined")
+
+
+if os.getenv("SIMBENCH_PATH") == None :
+    raise Exception("SIMBENCH_PATH is not defined")
+
+gem5_path=os.getenv("GEM5_PATH") # '/home/toky/work/simulators/gem5-stable'
+simbench_path=os.getenv("SIMBENCH_PATH") #'/home/toky/work/pamela/simbench'
 
 addToPath(gem5_path+'/configs/common')
 addToPath(gem5_path+'/configs/ruby')
@@ -169,7 +177,7 @@ for i in xrange(1):
 		test_sys.cpu[i].addCheckerCpu()
 	test_sys.cpu[i].createThreads()	
 
-test_sys.kernel = './out/arm/realview-pba8/simbench'
+test_sys.kernel = simbench_path + '/out/arm/realview-pba8/simbench'
 
 CacheConfig.config_cache(options, test_sys)
 MemConfig.config_mem(options, test_sys)

@@ -3,11 +3,10 @@
 #include "harness.h"
 #include "mem.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 50000
 
 static void ALIGN kernel()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_COLD_BENCHMARK_ITERATIONS;
 
 	const phys_mem_info_t *phys_mem = mem_get_phys_info();
 	uintptr_t mem_region_start = phys_mem->phys_mem_start;
@@ -15,7 +14,7 @@ static void ALIGN kernel()
 	
 	uint32_t page_size = 4096;
 	
-	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	debug_spinner_start(MEMORY_COLD_BENCHMARK_ITERATIONS);
 	
 	int it;
 	uintptr_t ptr = mem_region_start;
@@ -29,7 +28,7 @@ static void ALIGN kernel()
 
 static void kernel_control()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_COLD_BENCHMARK_ITERATIONS;
 
 	const phys_mem_info_t *phys_mem = mem_get_phys_info();
 	uintptr_t mem_region_start = phys_mem->phys_mem_start;
@@ -37,7 +36,7 @@ static void kernel_control()
 	
 	uint32_t page_size = 4096;
 	
-	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	debug_spinner_start(MEMORY_COLD_BENCHMARK_ITERATIONS);
 	
 	int it;
 	uintptr_t ptr = mem_region_start;
@@ -79,7 +78,7 @@ DEFINE_BENCHMARK(memory_cold_nommu) = {
 	.category="Memory",
 	.kernel=kernel,
 	.kernel_control=kernel_control,
-	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS,
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_COLD_BENCHMARK_ITERATIONS,
 };
 
 DEFINE_BENCHMARK(memory_cold_mmu) = {
@@ -89,5 +88,5 @@ DEFINE_BENCHMARK(memory_cold_mmu) = {
 	.kernel=kernel,
 	.kernel_control=kernel_control,
 	.kernel_cleanup=kernel_mmu_cleanup,
-	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_COLD_BENCHMARK_ITERATIONS
 };

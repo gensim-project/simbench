@@ -2,18 +2,16 @@
 #include "debug.h"
 #include "mem.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 500000
-
 static volatile uint32_t value = 0;
 
 __align12;
 
 static void ALIGN kernel()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_HOT_BENCHMARK_ITERATIONS;
 	uint32_t i;
 	
-	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	debug_spinner_start(MEMORY_HOT_BENCHMARK_ITERATIONS);
 	
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -32,10 +30,10 @@ static void ALIGN kernel()
 
 static void kernel_control()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_HOT_BENCHMARK_ITERATIONS;
 	uint32_t i;
 	
-	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	debug_spinner_start(MEMORY_HOT_BENCHMARK_ITERATIONS);
 	uint32_t value;
 	
 	for(i = 0; i < total_iterations; ++i) {
@@ -62,7 +60,7 @@ DEFINE_BENCHMARK(memory_hot_nommu) = {
 	.category="Memory",
 	.kernel=kernel,
 	.kernel_control=kernel_control,
-	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_HOT_BENCHMARK_ITERATIONS
 };
 
 DEFINE_BENCHMARK(memory_hot_mmu) = {
@@ -72,5 +70,5 @@ DEFINE_BENCHMARK(memory_hot_mmu) = {
 	.kernel=kernel,
 	.kernel_control=kernel_control,
 	.kernel_cleanup=kernel_mmu_cleanup,
-	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_HOT_BENCHMARK_ITERATIONS
 };

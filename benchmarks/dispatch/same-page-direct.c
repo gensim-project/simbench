@@ -1,7 +1,6 @@
 #include "benchmark.h"
 #include "debug.h"
 
-#define DISPATCH_ITERATIONS 500000
 
 #define NOREORDER 
 #define NOINLINE __attribute__((noinline))
@@ -24,10 +23,10 @@ static void NOINLINE fn11() { asm volatile ("":::"memory");fn10(); }
 
 static void kernel()
 {
-	uint64_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_ITERATIONS;
+	uint64_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_SPD_BENCHMARK_ITERATIONS;
 	uint64_t i;
 	
-	debug_spinner_start(DISPATCH_ITERATIONS);
+	debug_spinner_start(DISPATCH_SPD_BENCHMARK_ITERATIONS);
 	
 	for(i=0; i < total_iterations; ++i)
 	{
@@ -40,5 +39,5 @@ DEFINE_BENCHMARK(intra_page_direct) = {
 	.name="Same-Page-Direct",
 	.category="Dispatch",
 	.kernel=kernel,
-	.iteration_count = DISPATCH_ITERATIONS * BENCHMARK_ITERATIONS
+	.iteration_count = DISPATCH_SPD_BENCHMARK_ITERATIONS * BENCHMARK_ITERATIONS
 };

@@ -3,7 +3,6 @@
 #include "mem.h"
 #include "printf.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 4000
 #define VIRT_BASE 0x40000000
 
 __align12;
@@ -38,13 +37,13 @@ static void kernel_mmu_init()
 }
 static void kernel_mmu()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_TLBFLUSH_BENCHMARK_ITERATIONS;
 	uint32_t i;
 
 	size_t ptr = virt_start;
 	size_t pagesize = mem_get_page_size();
 	
-	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	debug_spinner_start(MEMORY_TLBFLUSH_BENCHMARK_ITERATIONS);
 	
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -69,5 +68,5 @@ DEFINE_BENCHMARK(tlb_flush) = {
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel_mmu,
 	.kernel_cleanup=kernel_mmu_cleanup,
-	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_TLBFLUSH_BENCHMARK_ITERATIONS
 };

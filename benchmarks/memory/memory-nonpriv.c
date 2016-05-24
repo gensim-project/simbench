@@ -3,16 +3,15 @@
 #include "mem.h"
 #include "arch.h"
 
-#define MEMORY_BENCHMARK_ITERATIONS 300000
 
 static volatile uint32_t value = 0;
 
 static void ALIGN kernel()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * MEMORY_NONPRIV_BENCHMARK_ITERATIONS;
 	uint32_t i;
 		
-	debug_spinner_start(MEMORY_BENCHMARK_ITERATIONS);
+	debug_spinner_start(MEMORY_NONPRIV_BENCHMARK_ITERATIONS);
 		
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -41,5 +40,5 @@ DEFINE_BENCHMARK(memory_nonpriv) = {
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel,
 	.kernel_cleanup=kernel_mmu_cleanup,
-	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_BENCHMARK_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_NONPRIV_BENCHMARK_ITERATIONS
 };

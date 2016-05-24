@@ -4,8 +4,6 @@
 
 #include "define.h"
 
-#define CODEGEN_ITERATIONS 500
-
 static volatile uint32_t value1;
 static volatile uint32_t value2;
 static volatile uint32_t value3;
@@ -79,11 +77,11 @@ static void __attribute__((noinline)) ALIGN block()
 
 static void ALIGN kernel()
 {
-	uint64_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
+	uint64_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_LB_BENCHMARK_ITERATIONS;
 	uint64_t i;
 	volatile uint8_t* block_ptr = (volatile uint8_t*)block;
 	
-	debug_spinner_start(CODEGEN_ITERATIONS);
+	debug_spinner_start(CODEGEN_LB_BENCHMARK_ITERATIONS);
 	
 	for(i=0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -95,11 +93,11 @@ static void ALIGN kernel()
 
 static void ALIGN kernel_control()
 {
-	uint64_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS;
+	uint64_t total_iterations = BENCHMARK_ITERATIONS * CODEGEN_LB_BENCHMARK_ITERATIONS;
 	uint64_t i;
 	volatile uint8_t* block_ptr = (volatile uint8_t*)block;
 	uint8_t v;
-	debug_spinner_start(CODEGEN_ITERATIONS);
+	debug_spinner_start(CODEGEN_LB_BENCHMARK_ITERATIONS);
 	
 	for(i=0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -114,5 +112,5 @@ DEFINE_BENCHMARK(large_blocks) = {
 	.category="Codegen",
 	.kernel=kernel,
 	.kernel_control=kernel_control,
-	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * CODEGEN_LB_BENCHMARK_ITERATIONS
 };

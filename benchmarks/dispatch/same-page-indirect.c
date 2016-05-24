@@ -4,7 +4,6 @@
 #define NOREORDER 
 //#define NOREORDER __attribute__((no_reorder))
 
-#define DISPATCH_ITERATIONS 200
 
 __align12 NOREORDER;
 
@@ -40,10 +39,10 @@ static benchmark_kernel_t fn_table[FN_TABLE_SIZE] = { fn1, fn2, fn3, fn4, fn5, f
 
 static void kernel()
 {
-	uint32_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_ITERATIONS;
+	uint32_t total_iterations = BENCHMARK_ITERATIONS * DISPATCH_SPI_BENCHMARK_ITERATIONS;
 	int i = 0;
 	
-	debug_spinner_start(DISPATCH_ITERATIONS);
+	debug_spinner_start(DISPATCH_SPI_BENCHMARK_ITERATIONS);
 	
 	for(i = 0; i < total_iterations; ++i) {
 		debug_spinner();
@@ -55,5 +54,5 @@ DEFINE_BENCHMARK(intra_page_indirect) = {
 	.name="Same-Page-Indirect",
 	.category="Dispatch",
 	.kernel=kernel,
-	.iteration_count = DISPATCH_ITERATIONS * BENCHMARK_ITERATIONS
+	.iteration_count = DISPATCH_SPI_BENCHMARK_ITERATIONS * BENCHMARK_ITERATIONS
 };
