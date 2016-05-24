@@ -38,6 +38,11 @@ ifeq ($(SIMBENCH_DEBUG),1)
 	export CFLAGS+=-DSIMBENCH_DEBUG
 endif
 
+# Fast mode
+ifeq ($(SIMBENCH_FAST),1)
+	export CFLAGS+=-DSIMBENCH_FAST
+endif
+
 %/.build/${ARCH}/${PLATFORM}/built-in.o: .FORCE
 	@make -f build/Makefile.build DIR=$* __build
 
