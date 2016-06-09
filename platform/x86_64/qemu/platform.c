@@ -34,12 +34,12 @@ void platform_shutdown()
 
 uint32_t* platform_get_null_devptr()
 {
-	return (uint32_t*)0x10000008;
+	return (uint32_t*)0x0000fee00380ULL;
 }
 
 uint32_t platform_get_null_devval()
 {
-	return 0xff;
+	return 0x1234;
 }
 
 void platform_trigger_swi()
