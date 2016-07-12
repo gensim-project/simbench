@@ -1,8 +1,8 @@
 #include "benchmark.h"
 #include "debug.h"
 
-
-#define leaf_fn(x) static void ALIGN fn ## x() {}
+#define ALIGN __attribute__((aligned(4096)))
+#define leaf_fn(x) static void ALIGN ipi_fn ## x() {}
 
 #define FN_TABLE_SIZE 16
 static benchmark_kernel_t fn_table[];
@@ -30,7 +30,7 @@ leaf_fn(14)
 leaf_fn(15)
 leaf_fn(16)
 
-static benchmark_kernel_t fn_table[FN_TABLE_SIZE] = { fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9, fn10, fn11, fn12, fn13, fn14, fn15, fn16 };
+static benchmark_kernel_t fn_table[FN_TABLE_SIZE] = { ipi_fn1, ipi_fn2, ipi_fn3, ipi_fn4, ipi_fn5, ipi_fn6, ipi_fn7, ipi_fn8, ipi_fn9, ipi_fn10, ipi_fn11, ipi_fn12, ipi_fn13, ipi_fn14, ipi_fn15, ipi_fn16 };
 
 static void kernel()
 {

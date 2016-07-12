@@ -9,17 +9,17 @@ __align12 NOREORDER;
 
 static volatile uint32_t value;
 
-static void NOINLINE fn1() { asm volatile ("":::"memory"); }
-static void NOINLINE fn2() { asm volatile ("":::"memory");fn1(); }
-static void NOINLINE fn3() { asm volatile ("":::"memory");fn2(); }
-static void NOINLINE fn4() { asm volatile ("":::"memory");fn3(); }
-static void NOINLINE fn5() { asm volatile ("":::"memory");fn4(); }
-static void NOINLINE fn6() { asm volatile ("":::"memory");fn5(); }
-static void NOINLINE fn7() { asm volatile ("":::"memory");fn6(); }
-static void NOINLINE fn8() { asm volatile ("":::"memory");fn7(); }
-static void NOINLINE fn9() { asm volatile ("":::"memory");fn8(); }
-static void NOINLINE fn10() { asm volatile ("":::"memory");fn9(); }
-static void NOINLINE fn11() { asm volatile ("":::"memory");fn10(); }
+static void NOINLINE spd_fn1() { asm volatile ("":::"memory"); }
+static void NOINLINE spd_fn2() { asm volatile ("":::"memory");spd_fn1(); }
+static void NOINLINE spd_fn3() { asm volatile ("":::"memory");spd_fn2(); }
+static void NOINLINE spd_fn4() { asm volatile ("":::"memory");spd_fn3(); }
+static void NOINLINE spd_fn5() { asm volatile ("":::"memory");spd_fn4(); }
+static void NOINLINE spd_fn6() { asm volatile ("":::"memory");spd_fn5(); }
+static void NOINLINE spd_fn7() { asm volatile ("":::"memory");spd_fn6(); }
+static void NOINLINE spd_fn8() { asm volatile ("":::"memory");spd_fn7(); }
+static void NOINLINE spd_fn9() { asm volatile ("":::"memory");spd_fn8(); }
+static void NOINLINE spd_fn10() { asm volatile ("":::"memory");spd_fn9(); }
+static void NOINLINE spd_fn11() { asm volatile ("":::"memory");spd_fn10(); }
 
 static void kernel()
 {
@@ -31,7 +31,7 @@ static void kernel()
 	for(i=0; i < total_iterations; ++i)
 	{
 		debug_spinner();
-		fn11(i);
+		spd_fn11(i);
 	}
 }
 

@@ -7,79 +7,7 @@
 
 static volatile uint32_t value;
 
-static void NOINLINE ALIGN fn1() 
-{
-	asm volatile ("");
-	value = 1;
-}
-
-static void NOINLINE ALIGN fn2() 
-{
-	asm volatile ("");
-	value = 2;
-}
-
-static void NOINLINE ALIGN fn3(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn1();
-	else fn2();
-}
-
-static void NOINLINE ALIGN fn4()
-{
-	asm volatile ("");
-	fn1();
-}
-
-static void NOINLINE ALIGN fn5(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn3(x >> 1);
-	else fn4();
-}
-
-static void NOINLINE ALIGN fn6(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn3(x >> 1);
-	else fn1();
-}
-
-static void NOINLINE ALIGN fn7(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn6(x >> 1);
-	else fn5(x >> 1);
-}
-
-static void NOINLINE ALIGN fn8(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn1();
-	else fn3(x >> 1);
-}
-
-static void NOINLINE ALIGN fn9(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn8(x >> 1);
-	else fn5(x >> 1);
-}
-
-static void NOINLINE ALIGN fn10(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn8(x >> 1);
-	else fn7(x >> 1);
-}
-
-static void NOINLINE ALIGN fn11(int x)
-{
-	asm volatile ("");
-	if(x & 1) fn9(x >> 1);
-	else fn10(x >> 1);
-}
+void ipd_fn_10(); 
 
 static void ALIGN kernel()
 {
@@ -91,7 +19,7 @@ static void ALIGN kernel()
 	for(i=0; i < total_iterations; ++i)
 	{
 		debug_spinner();
-		fn11(i);
+		ipd_fn_10();
 	}
 }
 
