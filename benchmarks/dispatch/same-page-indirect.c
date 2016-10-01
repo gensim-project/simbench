@@ -7,7 +7,7 @@
 
 __align12 NOREORDER;
 
-#define leaf_fn(x) static void NOREORDER fn ## x() {}
+#define leaf_fn(x) static void NOREORDER spi_fn ## x() {}
 
 #define FN_TABLE_SIZE 16
 static benchmark_kernel_t fn_table[];
@@ -35,7 +35,7 @@ leaf_fn(14)
 leaf_fn(15)
 leaf_fn(16)
 
-static benchmark_kernel_t fn_table[FN_TABLE_SIZE] = { fn1, fn2, fn3, fn4, fn5, fn6, fn7, fn8, fn9, fn10, fn11, fn12, fn13, fn14, fn15, fn16 };
+static benchmark_kernel_t fn_table[FN_TABLE_SIZE] = { spi_fn1, spi_fn2, spi_fn3, spi_fn4, spi_fn5, spi_fn6, spi_fn7, spi_fn8, spi_fn9, spi_fn10, spi_fn11, spi_fn12, spi_fn13, spi_fn14, spi_fn15, spi_fn16 };
 
 static void kernel()
 {

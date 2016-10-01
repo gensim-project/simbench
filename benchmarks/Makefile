@@ -1,3 +1,4 @@
+OBJ :=
 
 mem-benchmarks       := 
 mem-benchmarks       += memory/tlb-flush.o
@@ -11,6 +12,7 @@ dispatch-benchmarks  += dispatch/same-page-indirect.o
 dispatch-benchmarks  += dispatch/inter-page-indirect.o
 dispatch-benchmarks  += dispatch/same-page-direct.o 
 dispatch-benchmarks  += dispatch/inter-page-direct.o
+dispatch-benchmarks  += dispatch/inter-page-direct/ipd-fn-0.o dispatch/inter-page-direct/ipd-fn-1.o dispatch/inter-page-direct/ipd-fn-2.o dispatch/inter-page-direct/ipd-fn-3.o dispatch/inter-page-direct/ipd-fn-4.o dispatch/inter-page-direct/ipd-fn-5.o dispatch/inter-page-direct/ipd-fn-6.o dispatch/inter-page-direct/ipd-fn-7.o dispatch/inter-page-direct/ipd-fn-8.o dispatch/inter-page-direct/ipd-fn-9.o dispatch/inter-page-direct/ipd-fn-10.o 
 
 codegen-benchmarks   := 
 codegen-benchmarks   += codegen/small-blocks.o 
