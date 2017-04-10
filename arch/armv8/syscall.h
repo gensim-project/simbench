@@ -1,0 +1,7 @@
+#ifndef ARMV8_SYSCALL_H
+#define ARMV8_SYSCALL_H
+
+#define SYSCALL_IRQ_ENABLE 1
+#define SYSCALL_IRQ_DISABLE 2
+
+#endif
