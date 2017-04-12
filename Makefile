@@ -1,5 +1,6 @@
 export MAKEFLAGS += -rR --no-print-directory
 export Q := @
+export SIMBENCH_FAST=1
 
 # Architecture/Platform Selection
 export ARCH	?= $(shell uname -m)

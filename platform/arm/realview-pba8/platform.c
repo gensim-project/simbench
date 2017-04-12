@@ -83,8 +83,8 @@ void platform_trigger_swi()
 	
 	
 	// generate SGI0
-	uint32_t targetlistfilter = 0x0;
-	uint32_t cputargetlist = 1;
+	uint32_t targetlistfilter = 0x2;
+	uint32_t cputargetlist = 0;
 	uint32_t nsatt = 0;
 	uint32_t sgiintid = 32;
 	

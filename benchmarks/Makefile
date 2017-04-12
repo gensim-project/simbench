@@ -30,8 +30,8 @@ io-benchmarks        += io/device-access.o
 io-benchmarks        += io/coprocessor.o
 
 OBJ :=
-OBJ += $(exception-benchmarks)
-OBJ += $(codegen-benchmarks)
 OBJ += $(dispatch-benchmarks)
-OBJ += $(mem-benchmarks)
-OBJ += $(io-benchmarks)
+OBJ += $(codegen-benchmarks)
+#OBJ += $(exception-benchmarks)
+#OBJ += $(mem-benchmarks)
+#OBJ += $(io-benchmarks)
