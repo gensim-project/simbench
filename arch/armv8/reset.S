@@ -22,7 +22,10 @@ setup_stacks:
 	mov sp, X0
 	ret
 
+.extern vector_table_top
 load_vectors:
+	ldr x0, =vector_table_top
+	msr VBAR_EL1, x0
 	ret
 
 enable_caches:
@@ -33,12 +36,3 @@ run_simbench:
 	bl harness_main
 	
 	bl platform_shutdown
-
-.data
-el0_stack:
-	.space 4096
-el0_stack_top:
-
-el1_stack:
-	.space 4096
-el1_stack_top:

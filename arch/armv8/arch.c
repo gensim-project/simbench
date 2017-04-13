@@ -8,6 +8,11 @@ void arch_init()
 	// modify cpacr.fpen
 	uint32_t fpen = (1 << 20) | (1 << 21);
 	asm volatile ("msr CPACR_EL1, %0" :: "r"(fpen));
+	
+	// Install syscall handler
+	armv8_install_syscall_handler();
+	
+	armv8_heap_init();
 }
 
 void arch_abort()

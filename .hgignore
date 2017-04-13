@@ -5,3 +5,4 @@ syntax:regexp
 ^out/
 host/host
 nbproject
+images/

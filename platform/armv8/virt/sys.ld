@@ -1,58 +1,80 @@
+PHDRS {
+	vector PT_LOAD ;
+	text PT_LOAD ;
+	data PT_LOAD ;
+}
+
+_HEAP_SIZE = 1024*1024*1024 ;
+
 SECTIONS 
 {
-	
-	_VECTORS_RELOCATE = 0x5f0000;
-	
-	. = 0x0;
-	
+	. = 0x40000000 ;
 	_TEXT_START = .;
 	.text : 
-	{ 
-		*(.vectors)
-		
+	{		
+		KEEP(*(.vectors))
 		*sys.o(.startup);
 		KEEP(*(.startup));
-		*(.text) 		
-		
-	}
-
+		*(.text)
+	} :text
+	. = . + SIZEOF(.text);
+	
 	.ctors :
 	{
 		KEEP (*(SORT(.ctors.*)))
 		KEEP (*(.ctors))
-	}
+	} :text
+	. = . + SIZEOF(.ctors);
 	
 	_TEXT_END = .;
 
-	. = 0x50000000;
+	. = ALIGN(4k) ;
 	_DATA_START = .;
 
-	.rodata : ALIGN(4k)
+	.rodata : 
 	{ 
 		*(.rodata) 
-	}
+	} :data
+	. = . + SIZEOF(.rodata);
 
-	.data : ALIGN(4k)
+	. = ALIGN(4k);
+	.data : 
 	{ 
 		*(.data) 
-	}
+	}  :data 
+	. = . + SIZEOF(.data);
 
-	.benchmarks : ALIGN(4k)
+	. = ALIGN(4k);
+	.benchmarks : 
 	{
 		. = ALIGN(8);
 		_BENCHMARKS_START = .;
 		KEEP(*(.benchmarks));
 		_BENCHMARKS_END = .;
-	}
+	}  :data
+	. = . + SIZEOF(.benchmarks);
 	
-	.bss : ALIGN(4k)
+	. = ALIGN(4k);
+	.bss : 
 	{ 
 		*(COMMON)
 		*(.bss) 
-	}
+	}  :data
+	. = . + SIZEOF(.bss);
 
+	el0_stack_bottom = .;
+	. = . + 0x10000;
+	el0_stack_top = .;
+	el1_stack_bottom = .;
+	. = . + 0x10000;
+	el1_stack_top = .;
+	
 	_DATA_END = .;
 
+	. = ALIGN(1M) ;
+	_HEAP_START = . ;
+	. += _HEAP_SIZE ;
+	_HEAP_END = . ;
 }
 
 ENTRY(reset_handler)

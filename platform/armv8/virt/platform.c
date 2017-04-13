@@ -16,20 +16,20 @@ void platform_shutdown()
 
 uint32_t* platform_get_null_devptr()
 {
-	return (uint32_t*)0;
+	arch_abort();
 }
 
 uint32_t platform_get_null_devval()
 {
-	return 0;
+	arch_abort();
 }
 
 void platform_trigger_swi()
 {
-	while(1) ;
+	arch_abort();
 }
 
 void platform_clear_swi()
 {
-	while(1) ;
+	arch_abort();
 }

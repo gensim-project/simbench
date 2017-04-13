@@ -7,8 +7,26 @@ typedef exception_handler_t exception_table_t[64];
 static exception_table_t el0_sync_table;
 static irq_handler_t el0_irq_handler_;
 
+static int handle_syscall() {
+	// get the syscall syndrome
+	uint32_t esr;
+	asm volatile("mrs %0, ESR_EL1" : "=r"(esr));
+	uint32_t syndrome = esr & 0x1ffffff;
+	
+	switch(syndrome) {
+		case ARMV8_SYSCALL_SYNDROME_TEST:
+			return 0;
+		case ARMV8_SYSCALL_SIMBENCH:
+			return armv8_handle_syscall();
+	}
+}
+
 void armv8_install_sync_handler(int ec, exception_handler_t handler) {
 	el0_sync_table[ec] = handler;
+}
+
+void armv8_install_syscall_handler() {
+	el0_sync_table[ARMV8_EC_SYSCALL] = handle_syscall;
 }
 
 static int exception_skip() 
@@ -39,12 +57,14 @@ void arch_dfault_install_skip()
 
 void arch_syscall_install_skip()
 {
-	arch_abort();
+	// do nothing, the default behaviour in this arch for a syscall
+	// with the syndrome ARMV8_SYSCALL_SYNDROME_TEST is to skip the
+	// instruction
 }
 
 void arch_undef_install_skip()
 {
-	armv8_install_sync_handler(0, exception_skip);
+	armv8_install_sync_handler(ARMV8_EC_UNKNOWN, exception_skip);
 }
 
 void arch_irq_enable()
