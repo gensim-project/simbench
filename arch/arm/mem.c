@@ -49,7 +49,7 @@ static int mem_create_region_id_mapping(uintptr_t region_start, uintptr_t region
 	region_start &= ~(page_size-1);
 	
 	for(i = region_start; i <= region_end; i += page_size) {
-		if(mem_create_page_mapping(i, i)) return 1;
+		if(mem_create_page_mapping_data(i, i)) return 1;
 	}
 	return 0;
 }
@@ -216,7 +216,7 @@ void mem_init()
 	}
 	
 	mem_dprintf("Mapping vectors\r\n");	
-	mem_create_page_mapping(vector_ppage, vector_vpage);
+	mem_create_page_mapping_data(vector_ppage, vector_vpage);
 	
 	// Also ID map the physical location of the vectors
 	uint32_t vectorstart = (uintptr_t)&_VECTORS_RELOCATE & ~(mem_get_page_size()-1);
@@ -343,7 +343,13 @@ size_t mem_get_page_size()
 	return 1 << 20;
 }
 
-int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
+int mem_create_page_mapping_code(uintptr_t phys_addr, uintptr_t virt_addr)
+{
+	// just fall back to data mapping
+	return mem_create_page_mapping_data(phys_addr, virt_addr);
+}
+
+int mem_create_page_mapping_data(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	mem_dprintf("Mapping va=%p to pa=%p\r\n", virt_addr, phys_addr);
 

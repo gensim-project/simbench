@@ -56,3 +56,14 @@ void arch_coprocessor_access()
 	asm volatile("mrc p15, 0, %0, cr3, cr0, 0" : "=r"(data) :);
 }
 
+// Don't need to do anything here since we run in a privileged mode
+// by default.
+void arch_priv_enter()
+{
+	
+}
+
+void arch_priv_leave() 
+{
+	
+}

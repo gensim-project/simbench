@@ -103,3 +103,15 @@ void arch_irq_install_handler(irq_handler_t handler)
 	else
 		irq_reset_irq_handler();
 }
+
+// Don't need to do anything here since we don't support any benchmarks
+// which rely on this feature
+void arch_priv_enter()
+{
+	
+}
+
+void arch_priv_leave()
+{
+	
+}

@@ -19,7 +19,7 @@ static void map_page_ranges(uintptr_t phys_addr, uintptr_t virt_addr, int nr_pag
 	int i;
 
 	for (i = 0; i < nr_pages; i++) {
-		mem_create_page_mapping(phys_addr, virt_addr);
+		mem_create_page_mapping_data(phys_addr, virt_addr);
 		
 		phys_addr += 0x1000;
 		virt_addr += 0x1000;
@@ -41,7 +41,7 @@ static void prepare_runtime_pagetables()
 	map_page_ranges(PAGE_ADDR(_HEAP_START), PAGE_ADDR(_HEAP_START), ((uintptr_t)&_HEAP_SIZE) >> 12);
 	
 	// Map the LAPIC
-	mem_create_page_mapping((uintptr_t)LAPIC, (uintptr_t)LAPIC);
+	mem_create_page_mapping_data((uintptr_t)LAPIC, (uintptr_t)LAPIC);
 	
 	mem_tlb_flush();
 }
@@ -190,7 +190,12 @@ static int __create_page_mapping(uintptr_t pml4, uintptr_t phys_addr, uintptr_t 
 	set_flags(pt, PF_PRESENT | PF_WRITABLE | PF_USER);
 }
 
-int mem_create_page_mapping(uintptr_t phys_addr, uintptr_t virt_addr)
+int mem_create_page_mapping_data(uintptr_t phys_addr, uintptr_t virt_addr)
+{
+	__create_page_mapping(runtime_pagetables, phys_addr, virt_addr);
+}
+
+int mem_create_page_mapping_code(uintptr_t phys_addr, uintptr_t virt_addr)
 {
 	__create_page_mapping(runtime_pagetables, phys_addr, virt_addr);
 }
