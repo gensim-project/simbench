@@ -25,7 +25,7 @@ static void kernel_mmu_init()
 	size_t pagesize = mem_get_page_size();
 
 	while(ptr < phys_mem->phys_mem_end) {
-		mem_create_page_mapping(ptr, vptr);
+		mem_create_page_mapping_data(ptr, vptr);
 		ptr += pagesize;
 		vptr += pagesize;
 	}

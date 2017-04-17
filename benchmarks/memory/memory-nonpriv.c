@@ -22,7 +22,7 @@ static void ALIGN kernel()
 static void kernel_mmu_init()
 {
 	mem_init();
-	mem_create_page_mapping((uintptr_t)&value, (uintptr_t)&value);
+	mem_create_page_mapping_data((uintptr_t)&value, (uintptr_t)&value);
 	
 	mem_mmu_enable();
 	mem_tlb_flush();
@@ -40,5 +40,6 @@ DEFINE_BENCHMARK(memory_nonpriv) = {
 	.kernel_init=kernel_mmu_init,
 	.kernel=kernel,
 	.kernel_cleanup=kernel_mmu_cleanup,
-	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_NONPRIV_BENCHMARK_ITERATIONS
+	.iteration_count = BENCHMARK_ITERATIONS * MEMORY_NONPRIV_BENCHMARK_ITERATIONS,
+	.kernel_priv=1
 };

@@ -28,5 +28,7 @@ extern void arch_irq_disable();
 typedef void (*irq_handler_t)();
 extern void arch_irq_install_handler(irq_handler_t);
 
+extern void arch_priv_enter();
+extern void arch_priv_leave();
 
 #endif

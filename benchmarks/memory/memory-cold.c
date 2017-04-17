@@ -59,7 +59,7 @@ static void kernel_mmu_init()
 	uintptr_t mem_region_end =   phys_mem->phys_mem_end;
 	uint32_t page_size = mem_get_page_size();
 	while(mem_region_start < mem_region_end) {
-		mem_create_page_mapping(mem_region_start, mem_region_start);
+		mem_create_page_mapping_data(mem_region_start, mem_region_start);
 		mem_region_start += page_size;
 	}
 		

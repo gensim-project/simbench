@@ -9,21 +9,23 @@ vector_table:
 vector_table_top:
 
 el1_current_sp0_synchronous_vector:
-	ldr x0, =arch_abort
+	stp X0, X1, [SP, #-16]!
+	ldr X0, =armv8_backup_lr
+	str X30, [X0]
+	
+	bl save_state
+	ldr x0, =el1_lower_sync_handler
+	blr x0
+	cmp x0, #0
+	bne 1f
+	bl restore_state
+	
+	ldr X0, =armv8_backup_lr
+	ldr X30, [X0]
+	ldp X0, X1, [SP], #16
+	eret
+1:	ldr x0, =arch_abort
 	br x0
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
 	nop
 	nop
 	nop
@@ -284,21 +286,23 @@ el1_current_spx_serror_vector:
 
 /* Now for exceptions taken from a lower EL (EL0) with AARCH64 */
 el1_lower_synchronous_vector:
-	stp X0, X30, [SP, #-16]!
+	stp X0, X1, [SP, #-16]!
+	ldr X0, =armv8_backup_lr
+	str X30, [X0]
+	
 	bl save_state
 	ldr x0, =el1_lower_sync_handler
 	blr x0
 	cmp x0, #0
 	bne 1f
 	bl restore_state
-	ldp X0, X30, [SP], #16
+	
+	ldr X0, =armv8_backup_lr
+	ldr X30, [X0]
+	ldp X0, X1, [SP], #16
 	eret
 1:	ldr x0, =arch_abort
 	br x0
-	nop
-	nop
-	nop
-	nop
 	nop
 	nop
 	nop
@@ -458,3 +462,8 @@ restore_state:
 	ret
 
 .size vector_table, .-vector_table
+
+.data
+.globl armv8_backup_lr
+armv8_backup_lr:
+.word 0

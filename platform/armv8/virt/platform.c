@@ -1,6 +1,7 @@
 #include "platform.h"
 #include "printf.h"
 #include "uart.h"
+#include "constants.h"
 
 void platform_init()
 {
@@ -16,20 +17,79 @@ void platform_shutdown()
 
 uint32_t* platform_get_null_devptr()
 {
-	arch_abort();
+	char* uart0 = (char*)UART0_BASE;
+	return (uint32_t*)(uart0 + 0x44);
 }
 
 uint32_t platform_get_null_devval()
 {
-	arch_abort();
+	return 0;
 }
+
+
+#define GICD_BASE 0x08000000
+#define GICD_CTLR *(volatile uint32_t*)(GICD_BASE + 0x000)
+#define GICD_ISENABLER0 *(volatile uint32_t*)(GICD_BASE + 0x100)
+#define GICD_IPRIORITYR0 *(volatile uint32_t*)(GICD_BASE + 0x400)
+#define GICD_SGIR *(volatile uint32_t*)(GICD_BASE + 0x0f00)
+#define GICD_CPENDSGIR0 *(volatile uint32_t*)(GICD_BASE + 0xf10)
+#define GICD_PIDR0 *(volatile uint32_t*)(GICD_BASE + 0xfe0)
+#define GICD_PIDR1 *(volatile uint32_t*)(GICD_BASE + 0xfe4)
+#define GICD_PIDR2 *(volatile uint32_t*)(GICD_BASE + 0xfe8)
+#define GICD_PIDR3 *(volatile uint32_t*)(GICD_BASE + 0xfec)
+
+#define GICC_BASE 0x08010000
+#define GICC_CTLR *(volatile uint32_t*)(GICC_BASE + 0x000)
+#define GICC_PMR *(volatile uint32_t*)(GICC_BASE + 0x004)
+#define GICC_IAR *(volatile uint32_t*)(GICC_BASE + 0x00C)
+#define GICC_EOIR *(volatile uint32_t*)(GICC_BASE + 0x010)
 
 void platform_trigger_swi()
 {
-	arch_abort();
+	// interrogate GIC
+	uint32_t id0 = GICD_PIDR0;
+	uint32_t id1 = GICD_PIDR1;
+	uint32_t id2 = GICD_PIDR2;
+	uint32_t id3 = GICD_PIDR3;
+	
+/*
+	if(id0 != 0x90 || id1 != 0x13 || id2 != 0x4 || id3 != 0x0) {
+		fprintf(ERROR, "Could not identify GIC distributor interface!\r\n");
+		fprintf(ERROR, "Expected 90 13 4 0, got %x %x %x %x\r\n", id0, id1, id2, id3);
+		arch_abort();
+	} 
+*/	
+	// Interrupt should be enabled by reset value of GICD_ISENABLER0
+	// but just to be sure
+	GICD_ISENABLER0 = 0xffff;
+	
+	GICD_IPRIORITYR0 = 0xa0a0a0a0;
+	
+	// direct SGI0 to CPU0 GICD_ITARGETSR0 register
+	// (these are read only)
+	
+	// Set interrupt priority mask register
+	GICC_PMR = 0xf0;
+
+	// enable forwarding of interrupts on GICD_CTLR register
+	GICD_CTLR |= 0x3;
+	
+	// enable forwarding of interrupts to CPUs
+	GICC_CTLR |= 0x3;
+	
+	
+	// generate SGI0
+	uint32_t targetlistfilter = 0x2;
+	uint32_t cputargetlist = 0;
+	uint32_t nsatt = 0;
+	uint32_t sgiintid = 0;
+	
+	GICD_SGIR = sgiintid | (nsatt << 15) | (cputargetlist << 16) | (targetlistfilter << 24);
 }
 
 void platform_clear_swi()
 {
-	arch_abort();
+	uint32_t intid = GICC_IAR;
+	GICD_CPENDSGIR0 = 0xff;
+	GICC_EOIR = intid;
 }

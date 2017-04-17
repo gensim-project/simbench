@@ -9,4 +9,7 @@
 #define UART0_MEM_START 0x09000000
 #define UART0_MEM_END   0x09000fff
 
+#define GIC_MEM_START         0x08000000
+#define GIC_MEM_END           0x08020000
+
 #endif

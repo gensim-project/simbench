@@ -60,6 +60,7 @@ typedef struct {
 	benchmark_kernel_t kernel_cleanup;
 	benchmark_kernel_t kernel_control;
 	uint64_t iteration_count;
+	uint8_t kernel_priv;
 } benchmark_t;
 
 #define DEFINE_BENCHMARK(__name) const benchmark_t __attribute__((section(".benchmarks"))) __attribute__((aligned(__alignof__(unsigned long))))  __benchmark_##__name

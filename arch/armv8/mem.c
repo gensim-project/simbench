@@ -23,7 +23,7 @@ extern char _TEXT_START, _TEXT_END, _DATA_START, _DATA_END;
 
 static int mem_inited = 0;
 
-static int mem_create_region_id_mapping(uintptr_t region_start, uintptr_t region_end)
+static int mem_create_region_id_mapping_data(uintptr_t region_start, uintptr_t region_end)
 {
 	uintptr_t i;
 	size_t page_size = mem_get_page_size();
@@ -31,7 +31,20 @@ static int mem_create_region_id_mapping(uintptr_t region_start, uintptr_t region
 	region_start &= ~(page_size-1);
 	
 	for(i = region_start; i <= region_end; i += page_size) {
-		if(mem_create_page_mapping(i, i)) return 1;
+		if(mem_create_page_mapping_data(i, i)) return 1;
+	}
+	return 0;
+}
+
+static int mem_create_region_id_mapping_code(uintptr_t region_start, uintptr_t region_end)
+{
+	uintptr_t i;
+	size_t page_size = mem_get_page_size();
+	
+	region_start &= ~(page_size-1);
+	
+	for(i = region_start; i <= region_end; i += page_size) {
+		if(mem_create_page_mapping_code(i, i)) return 1;
 	}
 	return 0;
 }
@@ -88,10 +101,12 @@ int syscall_mem_init() {
 	// map simbench memory
 	
 	mem_dprintf("Mapping text\r\n");
-	mem_create_region_id_mapping((uintptr_t)&_TEXT_START, (uintptr_t)&_TEXT_END);
+	mem_create_region_id_mapping_code((uintptr_t)&_TEXT_START, (uintptr_t)&_TEXT_END);
 	
 	mem_dprintf("Mapping data\r\n");
-	mem_create_region_id_mapping((uintptr_t)&_DATA_START, (uintptr_t)&_DATA_END);
+	mem_create_region_id_mapping_data((uintptr_t)&_DATA_START, (uintptr_t)&_DATA_END);
+	
+	
 	
 	const phys_mem_info_t *dev_info = mem_get_device_info();
 	mem_dprintf("Mapping devices\r\n");
@@ -105,6 +120,8 @@ int syscall_mem_init() {
 }
 
 int syscall_mem_mmu_enable() {
+	mem_dprintf("Enabling MMU\n");
+	
 	uint32_t sctlr;
 	asm volatile("mrs %0, SCTLR_EL1" : "=r"(sctlr));
 	sctlr |= 1;
@@ -118,6 +135,8 @@ int syscall_mem_mmu_disable() {
 	asm volatile("mrs %0, SCTLR_EL1" : "=r"(sctlr));
 	sctlr &= ~1;
 	asm volatile("msr SCTLR_EL1, %0" :: "r"(sctlr));
+	
+	mem_dprintf("Disabled MMU\n");
 	
 	return 0;
 }

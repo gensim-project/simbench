@@ -36,3 +36,14 @@ run_simbench:
 	bl harness_main
 	
 	bl platform_shutdown
+
+
+.extern armv8_backup_lr
+.globl armv8_pabt_return
+armv8_pabt_return:
+	ldr X0, =armv8_backup_lr
+	ldr X0, [X0]
+	msr ELR_EL1, X0
+	mov X0, #0
+	ret
+.size armv8_pabt_return,.-armv8_pabt_return

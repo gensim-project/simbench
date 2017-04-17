@@ -13,9 +13,6 @@ static void ALIGN kernel()
 	
 	debug_spinner_start(IO_COPRO_BENCHMARK_ITERATIONS);
 	
-	volatile uint32_t *ptr = platform_get_null_devptr();
-	uint32_t val = platform_get_null_devval();
-	
 	for(i=0; i < total_iterations; ++i) {
 		debug_spinner();
 		arch_coprocessor_access();

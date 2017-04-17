@@ -40,9 +40,11 @@ static int exception_skip()
 	return 0;
 }
 
+int armv8_pabt_return();
+
 void arch_ifault_install_return()
 {
-	arch_abort();
+	armv8_install_sync_handler(0x20, armv8_pabt_return);
 }
 
 void arch_ifault_install_break()
@@ -52,7 +54,7 @@ void arch_ifault_install_break()
 
 void arch_dfault_install_skip()
 {
-	arch_abort();
+	armv8_install_sync_handler(0x24, exception_skip);
 }
 
 void arch_syscall_install_skip()
@@ -96,6 +98,7 @@ int el1_lower_irq_handler()
 		return 1;
 	} else {
 		el0_irq_handler_();
+		return 0;
 	}
 }
 
@@ -106,6 +109,10 @@ int el1_lower_sync_handler()
 	uint32_t ec = syndrome >> 26;
 	uint32_t iss = syndrome & 0x1ffffff;
 	uint32_t il = (syndrome >> 25) & 1;
+	
+#ifdef SIMBENCH_DEBUG
+	fprintf(OUTPUT, "Taken exception with EC 0x%x\n", ec);
+#endif
 	
 	if(el0_sync_table[ec] == NULL) {
 		fprintf(OUTPUT, "Exception taken when no handler was registered!\n");

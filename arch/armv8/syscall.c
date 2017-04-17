@@ -29,6 +29,30 @@ static int syscall_irq_enable() {
 	return 0;
 }
 
+static int syscall_priv_enter() {
+	uint32_t spsr;
+	asm volatile ("mrs %0, SPSR_EL1" : "=r"(spsr));
+	
+	spsr &= ~(3 << 2);
+	spsr |= (1 << 2);
+	
+	asm volatile ("msr SPSR_EL1, %0" :: "r"(spsr));
+	
+	return 0;
+}
+
+static int syscall_priv_leave() {
+	uint32_t spsr;
+	asm volatile ("mrs %0, SPSR_EL1" : "=r"(spsr));
+	
+	spsr &= ~(3 << 2);
+	spsr |= (0 << 2);
+	
+	asm volatile ("msr SPSR_EL1, %0" :: "r"(spsr));
+	
+	return 0;
+}
+
 int syscall_mem_init();
 int syscall_mem_mmu_enable();
 int syscall_mem_mmu_disable();
@@ -45,7 +69,11 @@ int armv8_handle_syscall() {
 		case SYSCALL_MMU_ENABLE:
 			return syscall_mem_mmu_enable();
 		case SYSCALL_MMU_DISABLE:
-			return syscall_mem_mmu_enable();
+			return syscall_mem_mmu_disable();
+		case SYSCALL_PRIV_ENTER:
+			return syscall_priv_enter();
+		case SYSCALL_PRIV_LEAVE:
+			return syscall_priv_leave();
 		default:
 			return 1;
 	}

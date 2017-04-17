@@ -15,6 +15,9 @@
 #define SYSCALL_FLUSH_DCACHE 6
 #define SYSCALL_FLUSH_ICACHE 7
 
+#define SYSCALL_PRIV_ENTER 8
+#define SYSCALL_PRIV_LEAVE 9
+
 void armv8_syscall(int call_no);
 
 #endif

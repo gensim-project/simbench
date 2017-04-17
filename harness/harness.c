@@ -9,7 +9,7 @@ void harness_init()
 }
 
 static void harness_execute(const benchmark_t *benchmark)
-{
+{	
 	fprintf(OUTPUT, "%s - %s", benchmark->category, benchmark->name);
 	
 	if (benchmark->kernel_init) benchmark->kernel_init();
@@ -18,15 +18,33 @@ static void harness_execute(const benchmark_t *benchmark)
 	
 	if (benchmark->kernel_control) {
 		fprintf(OUTPUT, " {");
+
+		if(benchmark->kernel_priv) {
+			arch_priv_enter();
+		}
 		benchmark->kernel_control();
+		if(benchmark->kernel_priv) {
+			arch_priv_leave();
+		}
+		
 		fprintf(OUTPUT, "}");
 	}
 
 	fprintf(OUTPUT, " [");
+	if(benchmark->kernel_priv) {
+		arch_priv_enter();
+	}
 	benchmark->kernel();
+	if(benchmark->kernel_priv) {
+		arch_priv_leave();
+	}
 	fprintf(OUTPUT, "]\r\n");
 
 	if (benchmark->kernel_cleanup) benchmark->kernel_cleanup();
+	
+	if(benchmark->kernel_priv) {
+		arch_priv_leave();
+	}
 }
 
 void harness_main()
